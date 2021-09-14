@@ -3,6 +3,7 @@
 import pytest
 from conveior_belt import conveior_belt
 
+
 def test_conveior_belt_in_reach():
     """
     Test that only the exepected object is
@@ -12,14 +13,10 @@ def test_conveior_belt_in_reach():
     belt = init_conveior()
     in_reach = list(belt.get_in_reach_items(robot))
     assert len(in_reach) == 1
-    (in_reach, stat), = in_reach
+    ((in_reach, stat),) = in_reach
     assert stat
     assert in_reach.item_id == 0
-    assert in_reach.inside 
-
-
-
-
+    assert in_reach.inside
 
 
 def init_conveior():

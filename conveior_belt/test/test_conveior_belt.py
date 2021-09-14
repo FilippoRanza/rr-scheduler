@@ -19,6 +19,42 @@ def test_conveior_belt_in_reach():
     assert in_reach.inside
 
 
+def test_item_position():
+    """
+    Test that each item on the conveior belt is in
+    the expected position
+    """
+    belt = init_conveior()
+    content = belt.content
+    assert len(content) == 3
+    for i in range(3):
+        item = content[i]
+        assert item.item_id == i
+
+    assert belt.content[0].item_y == 90
+    assert belt.content[1].item_y == 45
+    assert belt.content[2].item_y == 0
+
+
+def test_item_status():
+    """
+    Test a correct conversion of (prev_inside, curr_inside)
+    into an ItemStatus enumeration
+    """
+    assert conveior_belt.ItemStatus.IN_REACH == conveior_belt.ItemStatus.get_status(
+        True, True
+    )
+    assert conveior_belt.ItemStatus.OUT_REACH == conveior_belt.ItemStatus.get_status(
+        False, False
+    )
+    assert conveior_belt.ItemStatus.ENTERING == conveior_belt.ItemStatus.get_status(
+        False, True
+    )
+    assert conveior_belt.ItemStatus.EXITING == conveior_belt.ItemStatus.get_status(
+        True, False
+    )
+
+
 def init_conveior():
     belt = conveior_belt.ConveiorBelt()
     for _ in range(3):

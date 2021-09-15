@@ -8,7 +8,6 @@ This script can be used to simulate an abstract pick-and-place
 from argparse import ArgumentParser
 from enum import Enum, auto
 import math
-import random
 
 import rclpy
 from rclpy.node import Node
@@ -44,21 +43,21 @@ class ArmStatus:
         self.state = ArmState.READY
 
 
-def euclid_distance(p1, p2):
-    x1, y1 = p1
-    x2, y2 = p2
+def euclid_distance(p_1, p_2):
+    x_1, y_1 = p_1
+    x_2, y_2 = p_2
 
-    dx = (x2 - x1) ** 2
-    dy = (y2 - y1) ** 2
-    dist = dx + dy
+    d_x = (x_2 - x_1) ** 2
+    d_y = (y_2 - y_1) ** 2
+    dist = d_x + d_y
     return math.sqrt(dist)
 
 
 def compute_work_time(pos):
-    d1 = euclid_distance(REST_POINT, pos)
-    d2 = euclid_distance(pos, DROP_POINT)
-    d3 = euclid_distance(DROP_POINT, REST_POINT)
-    total = d1 + d2 + d3
+    d_1 = euclid_distance(REST_POINT, pos)
+    d_2 = euclid_distance(pos, DROP_POINT)
+    d_3 = euclid_distance(DROP_POINT, REST_POINT)
+    total = d_1 + d_2 + d_3
     time = math.ceil(total / ARM_SPEED) + DROP_TIME + PICK_TIME
     return time
 
@@ -106,7 +105,7 @@ class FakeArm:
         if not self.is_mine(take_cmd):
             return
         item_id = take_cmd.item_id
-        self.items.push(item_id)
+        self.take_items.append(item_id)
 
     def handle_item_location(self, item_loc: msg.ItemLocation):
         if is_in_reach(item_loc):

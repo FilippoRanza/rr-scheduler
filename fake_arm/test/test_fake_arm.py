@@ -27,7 +27,6 @@ def test_euclid_distance():
         assert pytest.approx(eucl) == dist
 
 
-
 def test_in_reach():
     position = 100
     span = 20
@@ -38,11 +37,9 @@ def test_in_reach():
         (100, True),
         (110, True),
         (120, True),
-        (125, False)
+        (125, False),
     ]
 
     for i, o in in_out:
         res = fake_arm.is_in_reach(i, position, span)
         assert res == o
-
-

@@ -6,6 +6,7 @@ in this project.
 """
 
 from argparse import ArgumentParser
+from dataclasses import dataclass
 from enum import Enum, auto
 
 import numpy as np
@@ -13,6 +14,8 @@ import numpy as np
 import rclpy
 from rclpy.node import Node
 from rr_interfaces import msg
+
+from . import get_best
 
 
 NODE_NAME = "controller"
@@ -23,9 +26,15 @@ class ArmState(Enum):
     WAITING = auto()
     WORKING = auto()
 
-class ArmInfo:
+    @classmethod
+    def from_int(cls, i: int):
+        return [cls.READY, cls.WAITING, cls.WORKING][i]
 
-    def __init__(self):
+
+class ArmInfo:
+    def __init__(self, reach_time: int, take_time: int):
+        self.time = 0
+        self.min_time = reach_time + take_time
         self.state = ArmState.READY
 
     def update_time(self, time):
@@ -36,14 +45,17 @@ class ArmInfo:
 
         self.time = time
 
+    def set_state(self, state: ArmState):
+        self.time = 0
+        self.state = state
+
     def is_available(self, pos):
         if self.state == ArmState.READY:
             return True
         if self.state == ArmState.WAITING:
-            pass
+            return False
         if self.state == ArmState.WORKING:
-            pass
-
+            return self.time < self.min_time
 
 
 class ArmStats:
@@ -69,42 +81,25 @@ class ArmStats:
         self.state = ArmState.WAITING
 
 
-
-class GetBest:
-    """To use within a for loop to identify the index with the associated minimal value. Usefull when the
-    use case is too complex for a simple `max` function"""
-
-    def __init__(self):
-        self.min_value = None
-        self.min_index = 0
-
-    def update(self, index, value):
-        if self.min_value is None or self.min_value > value:
-            self.min_value = value
-            self.min_index = index
-
-    def get_best(self):
-        if self.min_value is None:
-            raise ValueError("Current min value is None. self.update never called")
-        return self.min_index
-
-
+@dataclass
 class ArmChooser:
-    def __init__(self, arm_info: [ArmStats]):
-        self.arm_info = arm_info
+
+    arm_stats: [ArmStats]
+    arm_infos: [ArmInfo]
 
     def choose_best(self, pos):
-        get_best = GetBest()
-        for i, arm in enumerate(self.arm_info):
-            if arm.is_available():
-                val = self.run_test(arm, pos)
-                get_best.update(i, val)
-        return get_best.get_best()
+        best = get_best.GetBest()
+        for i, (stat, info) in self.__iter_arms__():
+            if info.is_available(pos):
+                val = self.run_test(stat, pos)
+                print(val)
+                best.update(i, val)
+        return best.get_best()
 
-    def run_test(self, arm, pos):
+    def run_test(self, arm: ArmStats, pos):
         arm.try_add(pos)
         output = self.compute_score()
-        arm.untry_add(pos)
+        arm.untry_add()
         return output
 
     def compute_score(self):
@@ -113,20 +108,27 @@ class ArmChooser:
         return hits_var + dist_var
 
     def get_variance(self, f):
-        vec = [f(arm) for arm in self.arm_info]
+        vec = [f(arm) for arm in self.arm_stats]
         return np.var(vec)
-    
+
+    def __iter_arms__(self):
+        return enumerate(zip(self.arm_stats, self.arm_infos))
 
 
+@dataclass
 class Controller:
-    def __init__(self):
-        pass
+    arm_stats: [ArmStats]
+    arm_infos: [ArmInfo]
+
+    def handle_new_item(self, item_id: int):
+        chooser = ArmChooser(self.arm_stats, self.arm_infos)
+        best = chooser.choose_best()
 
 
 class ControllerNode(Node):
     """Empty Node implementation"""
 
-    def __init__(self):
+    def __init__(self, controller: Controller):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
         self.conv_sub = self.create_subscription(

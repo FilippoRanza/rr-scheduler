@@ -23,13 +23,34 @@ class ArmState(Enum):
     WAITING = auto()
     WORKING = auto()
 
-
 class ArmInfo:
-    def __init__(self, position, span):
+
+    def __init__(self):
+        self.state = ArmState.READY
+
+    def update_time(self, time):
+        if time == 0:
+            self.state = ArmState.READY
+        else:
+            self.state = ArmState.WORKING
+
+        self.time = time
+
+    def is_available(self, pos):
+        if self.state == ArmState.READY:
+            return True
+        if self.state == ArmState.WAITING:
+            pass
+        if self.state == ArmState.WORKING:
+            pass
+
+
+
+class ArmStats:
+    def __init__(self):
         self.hits = 0
         self.dist = 0
         self.time = 0
-        self.state = ArmState.READY
         self.temp_dist = 0
 
     def try_add(self, dist):
@@ -47,21 +68,6 @@ class ArmInfo:
         self.hits += 1
         self.state = ArmState.WAITING
 
-    def update_time(self, time):
-        if time == 0:
-            self.state = ArmState.READY
-        else:
-            self.state = ArmState.WORKING
-
-        self.time = time
-
-    def is_available(self, pos):
-        if self.state == ArmState.READY:
-            return True
-        if self.state == ArmState.WAITING:
-            pass
-        if self.state == ArmState.WORKING:
-            pass
 
 
 class GetBest:
@@ -84,8 +90,8 @@ class GetBest:
 
 
 class ArmChooser:
-    def __init__(self, arm_count):
-        self.arm_info = [ArmInfo() for _ in range(arm_count)]
+    def __init__(self, arm_info: [ArmStats]):
+        self.arm_info = arm_info
 
     def choose_best(self, pos):
         get_best = GetBest()

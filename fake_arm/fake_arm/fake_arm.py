@@ -62,9 +62,9 @@ def compute_work_time(pos):
     return time
 
 
-def is_in_reach(item_loc):
-    rel_y = item_loc.item_y - ROBOT_POSITION
-    return rel_y <= ROBOT_POSITION
+def is_in_reach(item_loc, position, span):
+    rel_y = abs(item_loc - position)
+    return rel_y <= span
 
 
 class FakeArm:
@@ -108,7 +108,7 @@ class FakeArm:
         self.take_items.append(item_id)
 
     def handle_item_location(self, item_loc: msg.ItemLocation):
-        if is_in_reach(item_loc):
+        if is_in_reach(item_loc.item_y, ROBOT_POSITION, ROBOT_SPAN):
             if item_loc.item_id in self.take_items:
                 self.item_loc[item_loc.item_id] = (item_loc.item_x, item_loc.item_y)
         else:

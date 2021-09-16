@@ -25,3 +25,24 @@ def test_euclid_distance():
     for p1, p2, dist in triplettes:
         eucl = fake_arm.euclid_distance(p1, p2)
         assert pytest.approx(eucl) == dist
+
+
+
+def test_in_reach():
+    position = 100
+    span = 20
+    in_out = [
+        (75, False),
+        (80, True),
+        (90, True),
+        (100, True),
+        (110, True),
+        (120, True),
+        (125, False)
+    ]
+
+    for i, o in in_out:
+        res = fake_arm.is_in_reach(i, position, span)
+        assert res == o
+
+

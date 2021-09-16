@@ -120,9 +120,14 @@ class Controller:
     arm_stats: [ArmStats]
     arm_infos: [ArmInfo]
 
-    def handle_new_item(self, item_id: int):
+    def handle_new_item(self, item_pos: int, item_id: int):
         chooser = ArmChooser(self.arm_stats, self.arm_infos)
-        best = chooser.choose_best()
+        best = chooser.choose_best(item_pos)
+        self.arm_stats[best].add_hit(item_pos)
+        self.arm_infos[best].set_state(ArmState.WAITING)
+        return best
+
+    
 
 
 class ControllerNode(Node):
@@ -140,12 +145,23 @@ class ControllerNode(Node):
         )
 
         self.arm_cmd = self.create_publisher(msg.TakeItem, "", 10)
+        self.controller = controller
+
 
     def conveior_state_listener(self, msg: msg.NewItem):
-        pass
+        robot_id = self.controller.handle_new_item(msg.item_pos, msg.item_id)
+        self.__notify_robots__(msg.item_id, robot_id)
 
     def arm_state_listener(self, msg: msg.ArmState):
         pass
+
+    def __notify_robots__(self, item_id, robot_id):
+        msg = msg.TakeItem()
+        msg.item_id = item_id
+        msg.robot_id = robot_id
+        self.arm_cmd.publish(msg)
+
+
 
 
 def parse_args():

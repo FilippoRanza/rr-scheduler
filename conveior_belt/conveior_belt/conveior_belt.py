@@ -63,8 +63,8 @@ class ConveiorBeltNode(Node):
         super().__init__(NODE_NAME)
         self.move_amout = move_amout
         self.belt = ConveiorBelt()
-        self.ctrl_pub = self.create_publisher(msg.NewItem, "new-item-topic", 10)
-        self.arm_pub = self.create_publisher(msg.ItemLocation, "in-reach-topic", 10)
+        self.ctrl_pub = self.create_publisher(msg.NewItem, "new_item_topic", 10)
+        self.arm_pub = self.create_publisher(msg.ItemLocation, "in_reach_topic", 10)
         self.create_timer(TIMER_PERIOD, self.publish_updates)
 
     def publish_updates(self):

@@ -134,12 +134,12 @@ class FakeArmNode(Node):
         super().__init__(NODE_NAME)
         self.arm = arm
         self.conv_sub = self.create_subscription(
-            msg.ItemLocation, "", self.conveior_belt_listener, 10
+            msg.ItemLocation, "in_reach_topic", self.conveior_belt_listener, 10
         )
         self.ctrl_sub = self.create_subscription(
-            msg.TakeItem, "", self.controller_listener, 10
+            msg.TakeItem, "take_item_cmd_topic", self.controller_listener, 10
         )
-        self.state_pub = self.create_publisher(msg.ArmState, "", 10)
+        self.state_pub = self.create_publisher(msg.ArmState, "arm_state_topic", 10)
         self.create_timer(TIMER_DELAY, self.arm.update_state)
 
     def arm_state_broadcaster(self):

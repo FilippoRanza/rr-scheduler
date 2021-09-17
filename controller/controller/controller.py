@@ -129,14 +129,14 @@ class ControllerNode(Node):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
         self.conv_sub = self.create_subscription(
-            msg.NewItem, "", self.conveior_state_listener, 10
+            msg.NewItem, "new_item_topic", self.conveior_state_listener, 10
         )
 
         self.arm_sub = self.create_subscription(
-            msg.ArmState, "", self.arm_state_listener, 10
+            msg.ArmState, "arm_state_topic", self.arm_state_listener, 10
         )
 
-        self.arm_cmd = self.create_publisher(msg.TakeItem, "", 10)
+        self.arm_cmd = self.create_publisher(msg.TakeItem, "take_item_cmd_topic", 10)
         self.controller = controller
 
     def conveior_state_listener(self, msg: msg.NewItem):

@@ -5,9 +5,9 @@ fake_arm.py is a simple robot arm simulator.
 This script can be used to simulate an abstract pick-and-place
 """
 
-from argparse import ArgumentParser
 from enum import Enum, auto
 import math
+import sys
 
 import rclpy
 from rclpy.node import Node
@@ -162,17 +162,10 @@ class FakeArmNode(Node):
         logger.info(log_msg)
 
 
-def parse_args():
-    """Parse command line arguments"""
-    parser = ArgumentParser()
-    return parser.parse_args()
-
 
 def main():
     """Default entrypoint for ros2 run"""
-    rclpy.init()
-    args = parse_args()
-
+    rclpy.init(args=sys.argv)
 
 if __name__ == "__main__":
     main()

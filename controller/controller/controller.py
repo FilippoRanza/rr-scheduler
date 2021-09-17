@@ -5,9 +5,9 @@ Skeleton file for a ROS node implementation
 in this project.
 """
 
-from argparse import ArgumentParser
 from dataclasses import dataclass
 from enum import Enum, auto
+import sys
 
 import numpy as np
 
@@ -154,16 +154,9 @@ class ControllerNode(Node):
         self.arm_cmd.publish(msg)
 
 
-def parse_args():
-    """Parse command line arguments"""
-    parser = ArgumentParser()
-    return parser.parse_args()
-
-
 def main():
     """Default entrypoint for ros2 run"""
-    rclpy.init()
-    args = parse_args()
+    rclpy.init(args=sys.argv)
 
 
 if __name__ == "__main__":

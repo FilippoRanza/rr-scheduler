@@ -27,9 +27,7 @@ for dir in controller conveior_belt fake_arm; do
     cd "$dir"
     echo "$dir"
     pytest-3
-    if [[ "$1" == 'lint ' ]] ; then
-        pylint "$dir"
-    fi
+    pylint "$dir"
     cd -
 done
 

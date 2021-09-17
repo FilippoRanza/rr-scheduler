@@ -4,9 +4,9 @@
 Conveior Belt simulator
 """
 
-from argparse import ArgumentParser
 from dataclasses import dataclass
 import random
+import sys
 
 import rclpy
 from rclpy.node import Node
@@ -93,16 +93,9 @@ def reach_msg_factory(item: Item):
     return in_reach
 
 
-def parse_args():
-    """Parse command line arguments"""
-    parser = ArgumentParser()
-    return parser.parse_args()
-
-
 def main():
     """Default entrypoint for ros2 run"""
-    rclpy.init()
-    args = parse_args()
+    rclpy.init(args=sys.argv)
 
     node = ConveiorBeltNode(MOVE_AMOUNT)
 

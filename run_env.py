@@ -8,11 +8,11 @@ def generate_launch_description():
         Node(
             package='controller',
             executable='controller',
-            name='main-controller'
+            name='main_controller'
         ),
         Node(
             package='conveior_belt',
             executable='conveior_belt',
-            name='conveior-belt'
+            name='conveior_belt'
         ),
     ])

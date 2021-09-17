@@ -48,6 +48,7 @@ class ArmInfo:
             return False
         if self.state == ArmState.WORKING:
             return self.time < self.min_time
+        raise ValueError(f"ArmState is not a valid: {self.state}")
 
 
 class ArmStats:
@@ -97,8 +98,8 @@ class ArmChooser:
         dist_var = self.get_variance(lambda arm: arm.dist)
         return hits_var + dist_var
 
-    def get_variance(self, f):
-        vec = [f(arm) for arm in self.arm_stats]
+    def get_variance(self, func):
+        vec = [func(arm) for arm in self.arm_stats]
         return np.var(vec)
 
     def __iter_arms__(self):
@@ -110,7 +111,7 @@ class Controller:
     arm_stats: [ArmStats]
     arm_infos: [ArmInfo]
 
-    def handle_new_item(self, item_pos: int, item_id: int):
+    def handle_new_item(self, item_pos: int):
         chooser = ArmChooser(self.arm_stats, self.arm_infos)
         best = chooser.choose_best(item_pos)
         self.arm_stats[best].add_hit(item_pos)
@@ -139,19 +140,19 @@ class ControllerNode(Node):
         self.arm_cmd = self.create_publisher(msg.TakeItem, "take_item_cmd_topic", 10)
         self.controller = controller
 
-    def conveior_state_listener(self, msg: msg.NewItem):
-        robot_id = self.controller.handle_new_item(msg.item_pos, msg.item_id)
-        self.__notify_robots__(msg.item_id, robot_id)
+    def conveior_state_listener(self, new_item: msg.NewItem):
+        robot_id = self.controller.handle_new_item(new_item.item_pos)
+        self.__notify_robots__(new_item.item_id, robot_id)
 
-    def arm_state_listener(self, msg: msg.ArmState):
-        state = ArmState.from_int(msg.state)
+    def arm_state_listener(self, arm_state: msg.ArmState):
+        state = ArmState.from_int(arm_state.state)
         self.controller.update_arm_state(state, state.time, state.robot_id)
 
     def __notify_robots__(self, item_id, robot_id):
-        msg = msg.TakeItem()
-        msg.item_id = item_id
-        msg.robot_id = robot_id
-        self.arm_cmd.publish(msg)
+        take_item = msg.TakeItem()
+        take_item.item_id = item_id
+        take_item.robot_id = robot_id
+        self.arm_cmd.publish(take_item)
 
 
 def main():

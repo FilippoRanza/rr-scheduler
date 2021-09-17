@@ -1,9 +1,19 @@
 #! /usr/bin/python3
 
 
+"""
+Get Best: return the index
+associated with the minimal value of a certain
+operation. Usefull when the operation is too complex
+for the max function.
+"""
+
+
 class GetBest:
-    """To use within a for loop to identify the index with the associated minimal value. Usefull when the
-    use case is too complex for a simple `max` function"""
+    """To use within a for loop to identify the index with the
+    associated minimal value.
+    Usefull when the use case is too complex for a simple `max`
+    function"""
 
     def __init__(self):
         self.min_value = None

@@ -16,12 +16,14 @@ for dir in rr_interfaces controller conveior_belt fake_arm; do
     cd -
 done
 
-run controller 
+ros2 launch run_env.py
 
-run conveior_belt
+# run controller 
+
+# run conveior_belt
 
 
-run fake_arm 0
-run fake_arm 1
-run fake_arm 2
+# run fake_arm 0
+# run fake_arm 1
+# run fake_arm 2
 

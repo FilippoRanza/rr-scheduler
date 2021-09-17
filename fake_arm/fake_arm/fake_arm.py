@@ -162,10 +162,10 @@ class FakeArmNode(Node):
         logger.info(log_msg)
 
 
-
 def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
+
 
 if __name__ == "__main__":
     main()

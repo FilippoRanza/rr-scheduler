@@ -3,6 +3,7 @@
 import pytest
 from controller import controller
 
+
 def test_empty_chooser():
     chooser = controller.ArmChooser([], [])
     with pytest.raises(ValueError):
@@ -24,7 +25,6 @@ def test_arm_available():
         stats, infos = initialize_arm_list(i)
         chooser = controller.ArmChooser(stats, infos)
         assert chooser.choose_best(50) == 0, f"Index: {i}"
-
 
 
 def initialize_arm_list(count):

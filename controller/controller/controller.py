@@ -37,14 +37,6 @@ class ArmInfo:
         self.min_time = reach_time + take_time
         self.state = ArmState.READY
 
-    def update_time(self, time):
-        if time == 0:
-            self.state = ArmState.READY
-        else:
-            self.state = ArmState.WORKING
-
-        self.time = time
-
     def set_state(self, state: ArmState):
         self.time = 0
         self.state = state
@@ -62,7 +54,6 @@ class ArmStats:
     def __init__(self):
         self.hits = 0
         self.dist = 0
-        self.time = 0
         self.temp_dist = 0
 
     def try_add(self, dist):
@@ -78,7 +69,6 @@ class ArmStats:
     def add_hit(self, dist):
         self.dist += dist
         self.hits += 1
-        self.state = ArmState.WAITING
 
 
 @dataclass
@@ -127,7 +117,9 @@ class Controller:
         self.arm_infos[best].set_state(ArmState.WAITING)
         return best
 
-    
+    def update_arm_state(self, state: ArmState, time: float, robot_id: int):
+        self.arm_infos[robot_id].state = state
+        self.arm_infos[robot_id].time = time
 
 
 class ControllerNode(Node):
@@ -147,21 +139,19 @@ class ControllerNode(Node):
         self.arm_cmd = self.create_publisher(msg.TakeItem, "", 10)
         self.controller = controller
 
-
     def conveior_state_listener(self, msg: msg.NewItem):
         robot_id = self.controller.handle_new_item(msg.item_pos, msg.item_id)
         self.__notify_robots__(msg.item_id, robot_id)
 
     def arm_state_listener(self, msg: msg.ArmState):
-        pass
+        state = ArmState.from_int(msg.state)
+        self.controller.update_arm_state(state, state.time, state.robot_id)
 
     def __notify_robots__(self, item_id, robot_id):
         msg = msg.TakeItem()
         msg.item_id = item_id
         msg.robot_id = robot_id
         self.arm_cmd.publish(msg)
-
-
 
 
 def parse_args():

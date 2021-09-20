@@ -132,7 +132,7 @@ class FakeArmNode(Node):
     def __init__(self, arm: FakeArm):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
-        self.declare_parameter('index', 0)
+        self.declare_parameter('index', 'x')
         index = self.get_parameter('index').get_parameter_value().string_value
         self.__log__(f"Node index: {index}")
         self.arm = arm

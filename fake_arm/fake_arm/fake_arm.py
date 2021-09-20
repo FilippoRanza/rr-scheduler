@@ -175,6 +175,7 @@ class FakeArmNode(Node):
     def __make_config__(self):
         fields = get_fields(RobotConfig)
         values = {field: self.__get_param__(field) for field in fields}
+        self.__log__(f"Config: {values}")
         return RobotConfig(*values)
 
     def __log__(self, log_msg):

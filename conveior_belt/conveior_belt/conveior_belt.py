@@ -99,9 +99,7 @@ def main():
 
     node = ConveiorBeltNode(MOVE_AMOUNT)
 
-
     rclpy.shutdown()
-
 
 
 if __name__ == "__main__":

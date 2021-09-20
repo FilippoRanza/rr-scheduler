@@ -6,6 +6,8 @@ This script can be used to simulate an abstract pick-and-place
 """
 
 from enum import Enum, auto
+import dataclasses
+from dataclasses import dataclass
 import math
 import sys
 
@@ -17,18 +19,19 @@ from rr_interfaces import msg
 NODE_NAME = "fake_arm"
 TIMER_DELAY = 1 / 1000  # 1ms
 
-# In future version this parameters will be fetch externally
-ARM_SPEED = 1
+MISSING_VALUE = -1
 
-REST_POINT = (-40, 0)
-DROP_POINT = (-90, 0)
 
-PICK_TIME = 5
-DROP_TIME = 3
-
-ROBOT_POSITION = 100
-ROBOT_SPAN = 100
-###
+@dataclass
+class RobotConfig:
+    arm_id: int
+    arm_span: int
+    arm_speed: int
+    robot_pos: int
+    pick_time: int
+    drop_time: int
+    rest_point: (int, int)
+    drop_point: (int, int)
 
 
 class ArmState(Enum):
@@ -53,12 +56,12 @@ def euclid_distance(p_1, p_2):
     return math.sqrt(dist)
 
 
-def compute_work_time(pos):
-    d_1 = euclid_distance(REST_POINT, pos)
-    d_2 = euclid_distance(pos, DROP_POINT)
-    d_3 = euclid_distance(DROP_POINT, REST_POINT)
+def compute_work_time(pos, conf: RobotConfig):
+    d_1 = euclid_distance(conf.rest_point, pos)
+    d_2 = euclid_distance(pos, conf.drop_point)
+    d_3 = euclid_distance(conf.drop_point, conf.rest_point)
     total = d_1 + d_2 + d_3
-    time = math.ceil(total / ARM_SPEED) + DROP_TIME + PICK_TIME
+    time = math.ceil(total / conf.arm_speed) + conf.drop_time + conf.pick_time
     return time
 
 
@@ -68,11 +71,14 @@ def is_in_reach(item_loc, position, span):
 
 
 class FakeArm:
-    def __init__(self, robot_id):
-        self.robot_id = robot_id
+    def __init__(self):
+        self.config = None
         self.take_items = []
         self.item_loc = {}
         self.status = ArmStatus()
+
+    def set_config(self, conf: RobotConfig):
+        self.config = conf
 
     def update_state(self):
         if self.status.state == ArmState.READY:
@@ -90,7 +96,7 @@ class FakeArm:
         item = self.take_items[0]
         if loc := self.item_loc.get(item):
             self.status.state = ArmState.WORKING
-            self.status.time = compute_work_time(loc)
+            self.status.time = compute_work_time(loc, self.config)
             self.take_items.pop(0)
 
     def handle_working(self):
@@ -108,7 +114,7 @@ class FakeArm:
         self.take_items.append(item_id)
 
     def handle_item_location(self, item_loc: msg.ItemLocation):
-        if is_in_reach(item_loc.item_y, ROBOT_POSITION, ROBOT_SPAN):
+        if is_in_reach(item_loc.item_y, self.config.robot_pos, self.config.arm_span):
             if item_loc.item_id in self.take_items:
                 self.item_loc[item_loc.item_id] = (item_loc.item_x, item_loc.item_y)
         else:
@@ -123,7 +129,12 @@ class FakeArm:
         ]
 
     def is_mine(self, pkt):
-        return pkt.robot_id == self.robot_id
+        return pkt.robot_id == self.config.arm_id
+
+
+def get_fields(kls):
+    fields = dataclasses.fields(kls)
+    return map(lambda field: field.name, fields)
 
 
 class FakeArmNode(Node):
@@ -132,10 +143,11 @@ class FakeArmNode(Node):
     def __init__(self, arm: FakeArm):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
-        self.declare_parameter('index', -1)
-        index = self.get_parameter('index').get_parameter_value().integer_value
-        self.__log__(f"Node index: {index}")
+        self.__decl_params__(get_fields(RobotConfig))
+        config = self.__make_config__()
+        arm.set_config(config)
         self.arm = arm
+
         self.conv_sub = self.create_subscription(
             msg.ItemLocation, "in_reach_topic", self.conveior_belt_listener, 10
         )
@@ -160,16 +172,31 @@ class FakeArmNode(Node):
         self.__log__("take item cmd")
         self.arm.handle_take_item(take_cmd)
 
+    def __make_config__(self):
+        fields = get_fields(RobotConfig)
+        values = {field: self.__get_param__(field) for field in fields}
+        return RobotConfig(*values)
+
     def __log__(self, log_msg):
         logger = self.get_logger()
         logger.info(log_msg)
+
+    def __get_param__(self, name):
+        value = self.get_parameter(name).get_parameter_value().integer_value
+        if value == MISSING_VALUE:
+            raise ValueError(f"Parameter `{name}` is not set")
+        return value
+
+    def __decl_params__(self, iterable):
+        for param in iterable:
+            self.declare_parameter(param, MISSING_VALUE)
 
 
 def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
-    fake_arm = FakeArm(0)
+    fake_arm = FakeArm()
     node = FakeArmNode(fake_arm)
 
     try:
@@ -179,6 +206,7 @@ def main():
 
     node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()

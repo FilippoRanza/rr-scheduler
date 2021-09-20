@@ -54,8 +54,6 @@ class ArmArmInitializer:
 
         self.index += 1
         self.base_pos += self.base_dist
-        self.base_rest += self.base_dist
-        self.base_drop += self.base_dist
 
         return node_conf
 

@@ -134,7 +134,7 @@ class FakeArmNode(Node):
         super().__init__(NODE_NAME)
         self.declare_parameter('index', 0)
         index = self.get_parameter('index').get_parameter_value().string_value
-        self.__log__(f"Node index: {index}", index)
+        self.__log__(f"Node index: {index}")
         self.arm = arm
         self.conv_sub = self.create_subscription(
             msg.ItemLocation, "in_reach_topic", self.conveior_belt_listener, 10

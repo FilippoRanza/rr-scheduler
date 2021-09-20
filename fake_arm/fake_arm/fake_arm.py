@@ -30,8 +30,8 @@ class RobotConfig:
     robot_pos: int
     pick_time: int
     drop_time: int
-    rest_point: (int, int)
-    drop_point: (int, int)
+    rest_point: int
+    drop_point: int
 
 
 class ArmState(Enum):
@@ -57,9 +57,13 @@ def euclid_distance(p_1, p_2):
 
 
 def compute_work_time(pos, conf: RobotConfig):
-    d_1 = euclid_distance(conf.rest_point, pos)
-    d_2 = euclid_distance(pos, conf.drop_point)
-    d_3 = euclid_distance(conf.drop_point, conf.rest_point)
+
+    rest_point = (conf.robot_pos, conf.rest_point)
+    drop_point = (conf.robot_pos, conf.drop_point)
+
+    d_1 = euclid_distance(rest_point, pos)
+    d_2 = euclid_distance(pos, drop_point)
+    d_3 = euclid_distance(drop_point, rest_point)
     total = d_1 + d_2 + d_3
     time = math.ceil(total / conf.arm_speed) + conf.drop_time + conf.pick_time
     return time

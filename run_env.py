@@ -6,12 +6,6 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 
 
-def increase_tuple(t: (int, int), amt: int):
-    x, y = t
-    y += amt
-    return x, y
-
-
 @dataclass
 class BaseArmConfig:
     span: int
@@ -24,8 +18,8 @@ class ArmArmInitializer:
     def __init__(
         self,
         base_conf: BaseArmConfig,
-        base_rest: (int, int),
-        base_drop: (int, int),
+        base_rest: int,
+        base_drop: int,
         base_pos: int,
         base_dist: int,
     ):
@@ -60,8 +54,8 @@ class ArmArmInitializer:
 
         self.index += 1
         self.base_pos += self.base_dist
-        self.base_rest = increase_tuple(self.base_rest, self.base_dist)
-        self.base_drop = increase_tuple(self.base_drop, self.base_dist)
+        self.base_rest += self.base_dist
+        self.base_drop += self.base_dist
 
         return node_conf
 

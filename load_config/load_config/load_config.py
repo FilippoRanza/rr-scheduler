@@ -15,7 +15,7 @@ def load_configuration(node: Node, kls: type):
 
 def create_params(node: Node, params):
     for param in params:
-        node.create_parameter(param, MISSING_VALUE)
+        node.declare_parameter(param, MISSING_VALUE)
 
 
 def load_params(node: Node, params):

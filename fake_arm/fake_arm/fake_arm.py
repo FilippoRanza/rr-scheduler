@@ -144,8 +144,8 @@ class FakeArmNode(Node):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
         config = load_configuration(self, RobotConfig)
-        self.__log__(config)
-        arm.set_config(f"Config: {config}")
+        self.__log__(f"Config: {config}")
+        arm.set_config(config)
         self.arm = arm
 
         self.conv_sub = self.create_subscription(

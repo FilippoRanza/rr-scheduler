@@ -166,6 +166,7 @@ def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
+    rclpy.shutdown()
 
 if __name__ == "__main__":
     main()

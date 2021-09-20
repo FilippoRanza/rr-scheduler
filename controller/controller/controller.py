@@ -160,5 +160,7 @@ def main():
     rclpy.init(args=sys.argv)
 
 
+    rclpy.shutdown()
+
 if __name__ == "__main__":
     main()

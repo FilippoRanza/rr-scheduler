@@ -133,7 +133,7 @@ class FakeArmNode(Node):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
         index = self.get_parameter('index').get_parameter_value().string_value
-        print(f"Node index: {}", index)
+        print(f"Node index: {index}", index)
         self.arm = arm
         self.conv_sub = self.create_subscription(
             msg.ItemLocation, "in_reach_topic", self.conveior_belt_listener, 10

@@ -14,7 +14,7 @@ from rclpy.node import Node
 from rr_interfaces import msg
 
 
-NODE_NAME = "fake-arm"
+NODE_NAME = "fake_arm"
 TIMER_DELAY = 1 / 1000  # 1ms
 
 # In future version this parameters will be fetch externally

@@ -16,7 +16,7 @@ def generate_launch_description():
             Node(
                 package="fake_arm",
                 executable="fake_arm",
-                name="fake_arm_1"
+                name="fake_arm_1",
                 parameters=[
                     {'index': 0}
                 ]
@@ -25,7 +25,7 @@ def generate_launch_description():
             Node(
                 package="fake_arm",
                 executable="fake_arm",
-                name="fake_arm_2"
+                name="fake_arm_2",
                 parameters=[
                     {'index': 1}
                 ]
@@ -34,7 +34,7 @@ def generate_launch_description():
             Node(
                 package="fake_arm",
                 executable="fake_arm",
-                name="fake_arm_3"
+                name="fake_arm_3",
                 parameters=[
                     {'index': 2}
                 ]

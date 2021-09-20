@@ -145,7 +145,7 @@ class FakeArmNode(Node):
         super().__init__(NODE_NAME)
         config = load_configuration(self, RobotConfig)
         self.__log__(config)
-        arm.set_config(config)
+        arm.set_config(f"Config: {config}")
         self.arm = arm
 
         self.conv_sub = self.create_subscription(

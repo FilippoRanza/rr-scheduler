@@ -11,13 +11,12 @@ import sys
 import rclpy
 from rclpy.node import Node
 from rr_interfaces import msg
+from load_config import load_config
 
 
 NODE_NAME = "conveior_belt"
 TIMER_PERIOD = 1 / 1000  # 1ms
 
-# This parameters will be fetched from a configuration in the future
-MOVE_AMOUNT = 10
 
 @dataclass
 class ConveiorConfig:
@@ -63,9 +62,9 @@ class ConveiorBelt:
 class ConveiorBeltNode(Node):
     """Conveior Belt Node."""
 
-    def __init__(self, move_amout):
+    def __init__(self):
         super().__init__(NODE_NAME)
-        self.move_amout = move_amout
+        self.config = load_config(self, ConveiorConfig)
         self.belt = ConveiorBelt()
         self.ctrl_pub = self.create_publisher(msg.NewItem, "new_item_topic", 10)
         self.arm_pub = self.create_publisher(msg.ItemLocation, "in_reach_topic", 10)
@@ -89,8 +88,6 @@ class ConveiorBeltNode(Node):
             self.arm_pub.publish(item_loc)
 
 
-
-
 def reach_msg_factory(item: Item):
     in_reach = msg.ItemLocation()
     in_reach.item_x = item.item_x
@@ -103,7 +100,7 @@ def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
-    node = ConveiorBeltNode(MOVE_AMOUNT)
+    node = ConveiorBeltNode()
 
     rclpy.shutdown()
 

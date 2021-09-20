@@ -7,7 +7,7 @@ from rclpy.node import Node
 MISSING_VALUE = -1
 
 
-def load_config(node: Node, kls: type):
+def load_configuration(node: Node, kls: type):
     create_params(node, get_fields(kls))
     values = load_params(node, get_fields(kls))
     return kls(**values)

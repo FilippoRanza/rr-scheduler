@@ -11,7 +11,7 @@ import sys
 import rclpy
 from rclpy.node import Node
 from rr_interfaces import msg
-from load_config import load_config
+from load_config import load_configuration
 
 
 NODE_NAME = "conveior_belt"
@@ -64,7 +64,7 @@ class ConveiorBeltNode(Node):
 
     def __init__(self):
         super().__init__(NODE_NAME)
-        self.config = load_config(self, ConveiorConfig)
+        self.config = load_configuration(self, ConveiorConfig)
         self.belt = ConveiorBelt()
         self.ctrl_pub = self.create_publisher(msg.NewItem, "new_item_topic", 10)
         self.arm_pub = self.create_publisher(msg.ItemLocation, "in_reach_topic", 10)

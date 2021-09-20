@@ -26,7 +26,7 @@ class ArmArmInitializer:
         base_conf: BaseArmConfig,
         base_rest: (int, int),
         base_drop: (int, int),
-        bese_pos: int,
+        base_pos: int,
         base_dist: int,
     ):
         self.index = 0

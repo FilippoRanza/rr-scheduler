@@ -72,7 +72,7 @@ def generate_launch_description():
     ]
 
     arm_config = BaseArmConfig(50, 10, 1, 1)
-    arm_generator = ArmArmInitializer(arm_config, (-10, 100), (-40, 100), 100, 250)
+    arm_generator = ArmArmInitializer(arm_config, -10, -40, 100, 250)
     arm_conf = arm_generator.make_robots(3)
 
     launch_nodes = static_conf + arm_conf

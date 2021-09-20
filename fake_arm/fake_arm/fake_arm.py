@@ -58,8 +58,8 @@ def euclid_distance(p_1, p_2):
 
 def compute_work_time(pos, conf: RobotConfig):
 
-    rest_point = (conf.robot_pos, conf.rest_point)
-    drop_point = (conf.robot_pos, conf.drop_point)
+    rest_point = (conf.rest_point, conf.robot_pos)
+    drop_point = (conf.drop_point, conf.robot_pos)
 
     d_1 = euclid_distance(rest_point, pos)
     d_2 = euclid_distance(pos, drop_point)

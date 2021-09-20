@@ -132,6 +132,8 @@ class FakeArmNode(Node):
     def __init__(self, arm: FakeArm):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
+        index = self.get_parameter('index').get_parameter_value().string_value
+        print(f"Node index: {}", index)
         self.arm = arm
         self.conv_sub = self.create_subscription(
             msg.ItemLocation, "in_reach_topic", self.conveior_belt_listener, 10
@@ -166,6 +168,15 @@ def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
+    fake_arm = FakeArm(0)
+    node = FakeArmNode(fake_arm)
+
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        print("Node interrupt")
+
+    node.destroy_node()
     rclpy.shutdown()
 
 if __name__ == "__main__":

@@ -14,6 +14,7 @@ import sys
 import rclpy
 from rclpy.node import Node
 from rr_interfaces import msg
+from load_config import load_configuration
 
 
 NODE_NAME = "fake_arm"
@@ -136,19 +137,14 @@ class FakeArm:
         return pkt.robot_id == self.config.arm_id
 
 
-def get_fields(kls):
-    fields = dataclasses.fields(kls)
-    return map(lambda field: field.name, fields)
-
-
 class FakeArmNode(Node):
     """Empty Node implementation"""
 
     def __init__(self, arm: FakeArm):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
-        self.__decl_params__(get_fields(RobotConfig))
-        config = self.__make_config__()
+        config = load_configuration(self, RobotConfig)
+        self.__log__(config)
         arm.set_config(config)
         self.arm = arm
 
@@ -186,15 +182,6 @@ class FakeArmNode(Node):
         logger = self.get_logger()
         logger.info(log_msg)
 
-    def __get_param__(self, name):
-        value = self.get_parameter(name).get_parameter_value().integer_value
-        if value == MISSING_VALUE:
-            raise ValueError(f"Parameter `{name}` is not set")
-        return value
-
-    def __decl_params__(self, iterable):
-        for param in iterable:
-            self.declare_parameter(param, MISSING_VALUE)
 
 
 def main():

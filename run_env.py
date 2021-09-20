@@ -65,14 +65,14 @@ def generate_launch_description():
             package="controller",
             executable="controller",
             name="main_controller",
-            parameters=[
-                {"conveior_speed": 10},
-            ],
         ),
         Node(
             package="conveior_belt",
             executable="conveior_belt",
             name="conveior_belt",
+            parameters=[
+                {"conveior_speed": 10},
+            ],
         ),
     ]
 

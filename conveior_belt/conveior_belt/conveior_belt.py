@@ -19,6 +19,10 @@ TIMER_PERIOD = 1 / 1000  # 1ms
 # This parameters will be fetched from a configuration in the future
 MOVE_AMOUNT = 10
 
+@dataclass
+class ConveiorConfig:
+    conveior_speed: int
+
 
 @dataclass
 class Item:
@@ -83,6 +87,8 @@ class ConveiorBeltNode(Node):
         for item in self.belt.content.values():
             item_loc = reach_msg_factory(item)
             self.arm_pub.publish(item_loc)
+
+
 
 
 def reach_msg_factory(item: Item):

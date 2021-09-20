@@ -1,3 +1,3 @@
 #! /usr/bin/python
 
-from . import load_configuration
+from .load_config import load_configuration

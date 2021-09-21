@@ -72,7 +72,7 @@ def initialize_arm(
     drop_time: int,
     rest_dist: int,
     drop_dist: int,
-    base_pos: int,
+    pos: int,
     arm_dist: int,
     count: int,
 ):
@@ -83,7 +83,7 @@ def initialize_arm(
         base_conf,
         rest_dist,
         drop_dist,
-        base_pos,
+        pos,
         arm_dist,
     )
 
@@ -110,18 +110,10 @@ def complete_controller_config(config):
 
     controller_conf = config.get("controller", {})
 
-    #set_keys(controller_conf, conveior_conf, ['width', 'length'],)
+    set_keys(controller_conf, conveior_conf, ['width', 'length'], "conveior")
 
+    set_keys(controller_conf, arm_conf, ["span", "pos", "pick_time", "drop_time", "speed"], "arm")
 
-
-    controller_conf.setdefault("conveior_width", conveior_conf["width"])
-    controller_conf.setdefault("conveior_length", conveior_conf["length"])
-
-    controller_conf.setdefault("arm_span", arm_conf["span"])
-    controller_conf.setdefault("arm_pos", arm_conf["base_pos"])
-    controller_conf.setdefault("arm_pick_time", arm_conf["pick_time"])
-    controller_conf.setdefault("arm_drop_time", arm_conf["drop_time"])
-    controller_conf.setdefault("arm_speed", arm_conf["speed"])
     config["controller"] = controller_conf
     return config
 

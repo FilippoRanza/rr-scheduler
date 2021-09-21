@@ -99,10 +99,12 @@ def get_config_file():
             return value
     raise ValueError("Missing config parameter")
 
+
 def set_keys(dest: dict, source: dict, keys: list, head: str):
     for k_src in keys:
-        k_dst = head + '_' + k_src
+        k_dst = head + "_" + k_src
         dest.setdefault(k_dst, source[k_src])
+
 
 def complete_controller_config(config):
     conveior_conf = config["conveior"]
@@ -110,9 +112,14 @@ def complete_controller_config(config):
 
     controller_conf = config.get("controller", {})
 
-    set_keys(controller_conf, conveior_conf, ['width', 'length'], "conveior")
+    set_keys(controller_conf, conveior_conf, ["width", "length"], "conveior")
 
-    set_keys(controller_conf, arm_conf, ["span", "pos", "pick_time", "drop_time", "speed"], "arm")
+    set_keys(
+        controller_conf,
+        arm_conf,
+        ["span", "pos", "pick_time", "drop_time", "speed"],
+        "arm",
+    )
 
     config["controller"] = controller_conf
     return config

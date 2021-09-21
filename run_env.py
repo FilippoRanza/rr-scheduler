@@ -115,16 +115,14 @@ def generate_launch_description():
 
     controller_conf = config.get("controller", {})
 
-    controller_conf['conveior_width'] = conveior_conf['width']
-    controller_conf['conveior_length'] = conveior_conf['length']
+    controller_conf["conveior_width"] = conveior_conf["width"]
+    controller_conf["conveior_length"] = conveior_conf["length"]
 
-    controller_conf['arm_span'] = arm_conf['span']
-    controller_conf['arm_pos'] = arm_conf['base_pos']
-    controller_conf['arm_pick_time'] = arm_conf['pick_time']
-    controller_conf['arm_drop_time'] = arm_conf['drop_time']
-    controller_conf['arm_speed'] = arm_conf['speed']
-
-
+    controller_conf["arm_span"] = arm_conf["span"]
+    controller_conf["arm_pos"] = arm_conf["base_pos"]
+    controller_conf["arm_pick_time"] = arm_conf["pick_time"]
+    controller_conf["arm_drop_time"] = arm_conf["drop_time"]
+    controller_conf["arm_speed"] = arm_conf["speed"]
 
     static_conf = [
         Node(

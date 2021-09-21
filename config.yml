@@ -12,6 +12,6 @@ arm:
   drop_time: 1
   rest_dist: -10 
   drop_dist: -40
-  pos: 50
+  pos: 150
   arm_dist: 300
   count: 3

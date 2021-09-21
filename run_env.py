@@ -8,11 +8,6 @@ from launch_ros.actions import Node
 import sys
 import yaml
 
-ARM_SPAN = 50
-ARM_SPEED = 10
-ARM_PICK_TIME = 1
-ARM_DROP_TIME = 1
-
 
 @dataclass
 class BaseArmConfig:
@@ -56,16 +51,7 @@ class ArmParameterFactory:
         return arm_params
 
 
-def make_arm_node(index, params):
-    return Node(
-        package="fake_arm",
-        executable="fake_arm",
-        name=f"fake_arm_{index}",
-        parameters=[params],
-    )
-
-
-def initialize_arm(
+def make_arm_param_list(
     span: int,
     speed: int,
     pick_time: int,
@@ -87,7 +73,20 @@ def initialize_arm(
         arm_dist,
     )
 
-    return [make_arm_node(i, factory.make_robot()) for i in range(count)]
+    return [factory.make_robot() for _ in range(count)]
+
+
+def make_arm_node(index, params):
+    return Node(
+        package="fake_arm",
+        executable="fake_arm",
+        name=f"fake_arm_{index}",
+        parameters=[params],
+    )
+
+
+def initialize_arm(param_list):
+    return [make_arm_node(i, param) for i, param in enumerate(param_list)]
 
 
 def get_config_file():
@@ -112,17 +111,22 @@ def complete_controller_config(config):
 
     controller_conf = config.get("controller", {})
 
-    set_keys(controller_conf, conveior_conf, ["width", "length"], "conveior")
+    set_keys(controller_conf, conveior_conf, ["width", "length", "speed"], "conveior")
 
     set_keys(
         controller_conf,
         arm_conf,
-        ["span", "pos", "pick_time", "drop_time", "speed"],
+        ["span", "pick_time", "drop_time", "speed"],
         "arm",
     )
 
     config["controller"] = controller_conf
     return config
+
+
+def set_robot_position(config, arm_param_list):
+    pos_list = [param["robot_pos"] for param in arm_param_list]
+    config["arm_pos"] = pos_list
 
 
 def load_config():
@@ -139,6 +143,8 @@ def generate_launch_description():
     arm_conf = config["arm"]
 
     controller_conf = config.get("controller")
+    arm_param = make_arm_param_list(**arm_conf)
+    set_robot_position(controller_conf, arm_param)
 
     static_conf = [
         Node(
@@ -157,7 +163,7 @@ def generate_launch_description():
         ),
     ]
 
-    arm_conf = initialize_arm(**arm_conf)
+    arm_conf = initialize_arm(arm_param)
 
     launch_nodes = static_conf + arm_conf
 

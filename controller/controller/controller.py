@@ -26,6 +26,7 @@ NODE_NAME = "controller"
 class ControllerConfiguration:
     conveior_width: int
     conveior_length: int
+    conveior_speed: int
 
     arm_span: int
     arm_pos: int
@@ -169,11 +170,17 @@ class ControllerNode(Node):
         self.arm_cmd.publish(take_item)
 
 
+def make_arm_stat_list(count):
+    return [ArmStats() for _ in range(count)]
+
+
 def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
-    controller = Controller([], [])
+    arm_infos = []
+    arm_stats = make_arm_stat_list(len(arm_infos))
+    controller = Controller(arm_stats, arm_infos)
     node = ControllerNode(controller)
 
     node.destroy_node()

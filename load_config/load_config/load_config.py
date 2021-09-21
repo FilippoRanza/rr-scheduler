@@ -25,10 +25,8 @@ def load_params(node: Node, params):
 
 
 def load_param(node, name):
-    value = node.get_parameter(name).get_parameter_value().integer_value
-    if value == MISSING_VALUE:
-        raise ValueError(f"Parameter `{name}` is not set")
-    return value
+    param = node.get_parameter(name)
+    return param.value
 
 
 def get_fields(kls: type):

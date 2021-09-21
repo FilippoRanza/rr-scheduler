@@ -22,20 +22,33 @@ from . import get_best
 NODE_NAME = "controller"
 
 
+def ceil(num):
+    return int(np.ceil(num))
+
+
 @dataclass
 class ControllerConfiguration:
+    """
+    Controller main configuration: values loaded from
+    parameters.
+    """
+
     conveior_width: int
     conveior_length: int
     conveior_speed: int
 
     arm_span: int
-    arm_pos: int
+    arm_pos: [int]
     arm_pick_time: int
     arm_drop_time: int
     arm_speed: int
 
 
 class ArmState(Enum):
+    """
+    Current arm action.
+    """
+
     READY = auto()
     WAITING = auto()
     WORKING = auto()
@@ -46,6 +59,12 @@ class ArmState(Enum):
 
 
 class ArmInfo:
+    """
+    Manage the state of the robotic arm:
+    time to reach from conveior begin and
+    the current action.
+    """
+
     def __init__(self, reach_time: int, take_time: int):
         self.time = 0
         self.min_time = reach_time + take_time
@@ -66,6 +85,12 @@ class ArmInfo:
 
 
 class ArmStats:
+    """
+    Manage statistics about the robotic arm:
+    information such as the total distance and
+    the number of picked items.
+    """
+
     def __init__(self):
         self.hits = 0
         self.dist = 0
@@ -88,6 +113,12 @@ class ArmStats:
 
 @dataclass
 class ArmChooser:
+    """
+    Helper class: choose the best
+    arm in order to:
+        1. Be sure that the item will be taken
+        2. Ensure load balancing amoung the various arms.
+    """
 
     arm_stats: [ArmStats]
     arm_infos: [ArmInfo]
@@ -122,6 +153,10 @@ class ArmChooser:
 
 @dataclass
 class Controller:
+    """
+    Handle incoming request and update arm stats.
+    """
+
     arm_stats: [ArmStats]
     arm_infos: [ArmInfo]
 
@@ -137,13 +172,53 @@ class Controller:
         self.arm_infos[robot_id].time = time
 
 
+def pythagoras(cat_a, cat_b):
+    cat_a **= 2
+    cat_b **= 2
+    cat_c = cat_a + cat_b
+    cat_c = np.sqrt(cat_c)
+    return ceil(cat_c)
+
+
+def compute_reach_time(conveior_speed, arm_pos, arm_span):
+    min_take_dist = arm_pos - arm_span
+    return ceil(min_take_dist / conveior_speed)
+
+
+def compute_max_take_time(arm_speed, arm_span, rest_dist, conveior_dist):
+    cathetus_a = ceil(arm_span / 2)
+    cathetus_b = conveior_dist + rest_dist
+    dist = pythagoras(cathetus_a, cathetus_b)
+    return ceil(dist / arm_speed)
+
+
+def make_arm_stat_list(count):
+    return [ArmStats() for _ in range(count)]
+
+
+def controller_factory(conf: ControllerConfiguration):
+    max_take_time = compute_max_take_time(
+        conf.arm_speed, conf.arm_span, conf.rest_dist, conf.conveior_width
+    )
+    arm_infos = [
+        ArmInfo(
+            compute_reach_time(conf.conveior_speed, pos, conf.arm_span), max_take_time
+        )
+        for pos in conf.arm_pos
+    ]
+    arm_stats = make_arm_stat_list(len(arm_infos))
+    return Controller(arm_stats, arm_infos)
+
+
 class ControllerNode(Node):
     """Empty Node implementation"""
 
-    def __init__(self, controller: Controller):
+    def __init__(self):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
         self.config = load_configuration(self, ControllerConfiguration)
+        self.controller = controller_factory(self.config)
+
         self.conv_sub = self.create_subscription(
             msg.NewItem, "new_item_topic", self.conveior_state_listener, 10
         )
@@ -153,7 +228,6 @@ class ControllerNode(Node):
         )
 
         self.arm_cmd = self.create_publisher(msg.TakeItem, "take_item_cmd_topic", 10)
-        self.controller = controller
 
     def conveior_state_listener(self, new_item: msg.NewItem):
         robot_id = self.controller.handle_new_item(new_item.item_pos)
@@ -170,18 +244,11 @@ class ControllerNode(Node):
         self.arm_cmd.publish(take_item)
 
 
-def make_arm_stat_list(count):
-    return [ArmStats() for _ in range(count)]
-
-
 def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
-    arm_infos = []
-    arm_stats = make_arm_stat_list(len(arm_infos))
-    controller = Controller(arm_stats, arm_infos)
-    node = ControllerNode(controller)
+    node = ControllerNode()
 
     node.destroy_node()
     rclpy.shutdown()

@@ -20,7 +20,10 @@ TIMER_PERIOD = 1 / 1000  # 1ms
 
 @dataclass
 class ConveiorConfig:
-    conveior_speed: int
+    speed: int
+    width: int
+    length: int
+    spawn_rate: int
 
 
 @dataclass

@@ -14,7 +14,7 @@ class BaseArmConfig:
     drop_time: int
 
 
-class ArmArmInitializer:
+class ArmParameterFactory:
     def __init__(
         self,
         base_conf: BaseArmConfig,
@@ -30,32 +30,51 @@ class ArmArmInitializer:
         self.base_drop = base_drop
         self.base_dist = base_dist
 
-    def make_robots(self, count):
-        return [self.make_robot() for _ in range(count)]
-
     def make_robot(self):
-        node_conf = Node(
-            package="fake_arm",
-            executable="fake_arm",
-            name=f"fake_arm_{self.index}",
-            parameters=[
-                {
-                    "arm_id": self.index,
-                    "arm_span": self.config.span,
-                    "arm_speed": self.config.speed,
-                    "robot_pos": self.base_pos,
-                    "pick_time": self.config.pick_time,
-                    "drop_time": self.config.drop_time,
-                    "rest_point": self.base_rest,
-                    "drop_point": self.base_drop,
-                }
-            ],
-        )
+        arm_params = {
+            "arm_id": self.index,
+            "arm_span": self.config.span,
+            "arm_speed": self.config.speed,
+            "robot_pos": self.base_pos,
+            "pick_time": self.config.pick_time,
+            "drop_time": self.config.drop_time,
+            "rest_point": self.base_rest,
+            "drop_point": self.base_drop,
+        }
 
         self.index += 1
         self.base_pos += self.base_dist
 
-        return node_conf
+        return arm_params
+
+
+def make_arm_node(index, params):
+    return Node(
+        package="fake_arm",
+        executable="fake_arm",
+        name=f"fake_arm_{index}",
+        parameters=[params],
+    )
+
+
+def initialize_arm(
+    base_conf: BaseArmConfig,
+    base_rest: int,
+    base_drop: int,
+    base_pos: int,
+    base_dist: int,
+    count: int,
+):
+
+    factory = ArmParameterFactory(
+        base_conf,
+        base_rest,
+        base_drop,
+        base_pos,
+        base_dist,
+    )
+
+    return [make_arm_node(i, factory.make_robot()) for i in range(count)]
 
 
 def generate_launch_description():
@@ -71,14 +90,13 @@ def generate_launch_description():
             executable="conveior_belt",
             name="conveior_belt",
             parameters=[
-                {"conveior_speed": 10},
+                {"speed": 10, "width": 150, "length": 2000, "spawn_rate": 100},
             ],
         ),
     ]
 
-    arm_config = BaseArmConfig(50, 10, 1, 1)
-    arm_generator = ArmArmInitializer(arm_config, -10, -40, 100, 250)
-    arm_conf = arm_generator.make_robots(3)
+    base_config = BaseArmConfig(50, 10, 1, 1)
+    arm_conf = initialize_arm(base_config, -10, -40, 100, 250, 3)
 
     launch_nodes = static_conf + arm_conf
 

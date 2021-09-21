@@ -10,7 +10,9 @@ MISSING_VALUE = -1
 def load_configuration(node: Node, kls: type):
     create_params(node, get_fields(kls))
     values = load_params(node, get_fields(kls))
-    return kls(**values)
+    output = kls(**values)
+    log(node, output)
+    return output
 
 
 def create_params(node: Node, params):
@@ -32,3 +34,9 @@ def load_param(node, name):
 def get_fields(kls: type):
     fields = dataclasses.fields(kls)
     return map(lambda field: field.name, fields)
+
+
+def log(node, obj):
+    logger = node.get_logger()
+    log_msg = f"Load configuration for {type(node)}: {obj}"
+    logger.info(log_msg)

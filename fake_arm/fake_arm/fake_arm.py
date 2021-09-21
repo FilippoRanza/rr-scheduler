@@ -144,7 +144,6 @@ class FakeArmNode(Node):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
         config = load_configuration(self, RobotConfig)
-        self.__log__(f"Config: {config}")
         arm.set_config(config)
         self.arm = arm
 
@@ -189,12 +188,12 @@ def main():
 
     fake_arm = FakeArm()
     node = FakeArmNode(fake_arm)
-
+    """
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
         print("Node interrupt")
-
+    """
     node.destroy_node()
     rclpy.shutdown()
 

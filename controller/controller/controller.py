@@ -21,6 +21,12 @@ from . import get_best
 NODE_NAME = "controller"
 
 
+@dataclass
+class ControllerConfiguration:
+    conveior_width: int
+    conveior_length: int
+
+
 class ArmState(Enum):
     READY = auto()
     WAITING = auto()

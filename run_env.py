@@ -2,8 +2,16 @@
 
 from dataclasses import dataclass
 
+
 from launch import LaunchDescription
 from launch_ros.actions import Node
+import sys
+import yaml
+
+ARM_SPAN = 50
+ARM_SPEED = 10
+ARM_PICK_TIME = 1
+ARM_DROP_TIME = 1
 
 
 @dataclass
@@ -58,45 +66,84 @@ def make_arm_node(index, params):
 
 
 def initialize_arm(
-    base_conf: BaseArmConfig,
-    base_rest: int,
-    base_drop: int,
+    span: int,
+    speed: int,
+    pick_time: int,
+    drop_time: int,
+    rest_dist: int,
+    drop_dist: int,
     base_pos: int,
-    base_dist: int,
+    arm_dist: int,
     count: int,
 ):
 
+    base_conf = BaseArmConfig(span, speed, pick_time, drop_time)
+
     factory = ArmParameterFactory(
         base_conf,
-        base_rest,
-        base_drop,
+        rest_dist,
+        drop_dist,
         base_pos,
-        base_dist,
+        arm_dist,
     )
 
     return [make_arm_node(i, factory.make_robot()) for i in range(count)]
 
 
+def get_config_file():
+    key = "config:="
+    for arg in sys.argv:
+        if arg.startswith(key):
+            begin = len(key)
+            value = arg[begin:]
+            return value
+    raise ValueError("Missing config parameter")
+
+
+def load_config():
+    file_name = get_config_file()
+    with open(file_name) as file:
+        output = yaml.safe_load(file)
+    return output
+
+
 def generate_launch_description():
+
+    config = load_config()
+    conveior_conf = config["conveior"]
+    arm_conf = config["arm"]
+
+    controller_conf = config.get("controller", {})
+
+    controller_conf['conveior_width'] = conveior_conf['width']
+    controller_conf['conveior_length'] = conveior_conf['length']
+
+    controller_conf['arm_span'] = arm_conf['span']
+    controller_conf['arm_pos'] = arm_conf['base_pos']
+    controller_conf['arm_pick_time'] = arm_conf['pick_time']
+    controller_conf['arm_drop_time'] = arm_conf['drop_time']
+    controller_conf['arm_speed'] = arm_conf['speed']
+
+
 
     static_conf = [
         Node(
             package="controller",
             executable="controller",
             name="main_controller",
+            parameters=[controller_conf],
         ),
         Node(
             package="conveior_belt",
             executable="conveior_belt",
             name="conveior_belt",
             parameters=[
-                {"speed": 10, "width": 150, "length": 2000, "spawn_rate": 100},
+                conveior_conf,
             ],
         ),
     ]
 
-    base_config = BaseArmConfig(50, 10, 1, 1)
-    arm_conf = initialize_arm(base_config, -10, -40, 100, 250, 3)
+    arm_conf = initialize_arm(**arm_conf)
 
     launch_nodes = static_conf + arm_conf
 

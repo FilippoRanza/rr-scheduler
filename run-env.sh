@@ -16,7 +16,7 @@ for dir in rr_interfaces load_config controller conveior_belt fake_arm; do
     cd -
 done
 
-ros2 launch run_env.py
+ros2 launch run_env.py config:=config.yml
 
 # run controller 
 

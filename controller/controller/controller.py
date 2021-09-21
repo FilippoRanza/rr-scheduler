@@ -14,6 +14,7 @@ import numpy as np
 import rclpy
 from rclpy.node import Node
 from rr_interfaces import msg
+from load_config import load_configuration
 
 from . import get_best
 
@@ -25,6 +26,12 @@ NODE_NAME = "controller"
 class ControllerConfiguration:
     conveior_width: int
     conveior_length: int
+
+    arm_span: int
+    arm_pos: int
+    arm_pick_time: int
+    arm_drop_time: int
+    arm_speed: int
 
 
 class ArmState(Enum):
@@ -135,6 +142,7 @@ class ControllerNode(Node):
     def __init__(self, controller: Controller):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
+        self.config = load_configuration(self, ControllerConfiguration)
         self.conv_sub = self.create_subscription(
             msg.NewItem, "new_item_topic", self.conveior_state_listener, 10
         )

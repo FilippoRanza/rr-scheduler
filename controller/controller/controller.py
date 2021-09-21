@@ -165,6 +165,10 @@ def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
+    controller = Controller([], [])
+    node = ControllerNode(controller)
+
+    node.destroy_node()
     rclpy.shutdown()
 
 

@@ -74,7 +74,7 @@ class ConveiorBeltNode(Node):
         self.create_timer(TIMER_PERIOD, self.publish_updates)
 
     def publish_updates(self):
-        self.belt.step_ahead(self.move_amout)
+        self.belt.step_ahead(self.config.speed)
         self.update_controller()
         self.send_item_location_msg()
 
@@ -105,6 +105,7 @@ def main():
 
     node = ConveiorBeltNode()
 
+    node.destroy_node()
     rclpy.shutdown()
 
 

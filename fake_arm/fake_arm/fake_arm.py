@@ -6,7 +6,6 @@ This script can be used to simulate an abstract pick-and-place
 """
 
 from enum import Enum, auto
-import dataclasses
 from dataclasses import dataclass
 import math
 import sys
@@ -171,12 +170,6 @@ class FakeArmNode(Node):
         self.__log__("take item cmd")
         self.arm.handle_take_item(take_cmd)
 
-    def __make_config__(self):
-        fields = get_fields(RobotConfig)
-        values = {field: self.__get_param__(field) for field in fields}
-        self.__log__(f"Config: {values}")
-        return RobotConfig(*values)
-
     def __log__(self, log_msg):
         logger = self.get_logger()
         logger.info(log_msg)
@@ -188,12 +181,12 @@ def main():
 
     fake_arm = FakeArm()
     node = FakeArmNode(fake_arm)
-    """
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        print("Node interrupt")
-    """
+
+    # try:
+    #     rclpy.spin(node)
+    # except KeyboardInterrupt:
+    #     print("Node interrupt")
+
     node.destroy_node()
     rclpy.shutdown()
 

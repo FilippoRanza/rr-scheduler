@@ -99,12 +99,38 @@ def get_config_file():
             return value
     raise ValueError("Missing config parameter")
 
+def set_keys(dest: dict, source: dict, keys: list, head: str):
+    for k_src in keys:
+        k_dst = head + '_' + k_src
+        dest.setdefault(k_dst, source[k_src])
+
+def complete_controller_config(config):
+    conveior_conf = config["conveior"]
+    arm_conf = config["arm"]
+
+    controller_conf = config.get("controller", {})
+
+    #set_keys(controller_conf, conveior_conf, ['width', 'length'],)
+
+
+
+    controller_conf.setdefault("conveior_width", conveior_conf["width"])
+    controller_conf.setdefault("conveior_length", conveior_conf["length"])
+
+    controller_conf.setdefault("arm_span", arm_conf["span"])
+    controller_conf.setdefault("arm_pos", arm_conf["base_pos"])
+    controller_conf.setdefault("arm_pick_time", arm_conf["pick_time"])
+    controller_conf.setdefault("arm_drop_time", arm_conf["drop_time"])
+    controller_conf.setdefault("arm_speed", arm_conf["speed"])
+    config["controller"] = controller_conf
+    return config
+
 
 def load_config():
     file_name = get_config_file()
     with open(file_name) as file:
         output = yaml.safe_load(file)
-    return output
+    return complete_controller_config(output)
 
 
 def generate_launch_description():
@@ -113,16 +139,7 @@ def generate_launch_description():
     conveior_conf = config["conveior"]
     arm_conf = config["arm"]
 
-    controller_conf = config.get("controller", {})
-
-    controller_conf["conveior_width"] = conveior_conf["width"]
-    controller_conf["conveior_length"] = conveior_conf["length"]
-
-    controller_conf["arm_span"] = arm_conf["span"]
-    controller_conf["arm_pos"] = arm_conf["base_pos"]
-    controller_conf["arm_pick_time"] = arm_conf["pick_time"]
-    controller_conf["arm_drop_time"] = arm_conf["drop_time"]
-    controller_conf["arm_speed"] = arm_conf["speed"]
+    controller_conf = config.get("controller")
 
     static_conf = [
         Node(

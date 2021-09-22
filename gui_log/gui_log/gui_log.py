@@ -29,6 +29,7 @@ class GuiLog(tk.Frame):
         lbl["text"] = text
 
     def __update_gui__(self):
+        print("Time update")
         self.update()
         self.after(1, self.__update_gui__)
 

@@ -25,11 +25,9 @@ class GuiLog(tk.Frame):
         return output
 
     def set_text(self, name, text):
-        print(f"{name} -> {text}")
         self.queue.put((name, text))
 
     def __update_gui__(self):
-        print("Time update")
         while not self.queue.empty():
             name, text = self.queue.get()
             self.labels[name]["text"] = text

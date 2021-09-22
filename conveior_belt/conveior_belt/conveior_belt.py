@@ -37,17 +37,31 @@ class Item:
         self.item_y += amount
 
 
+class SpawnManager:
+    def __init__(self, spawn_rate):
+        self.rate = spawn_rate
+        self.index = 0
+
+    def should_spawn(self):
+        self.index = (self.index + 1) % self.rate
+        return self.index == 0
+
+
 class ConveiorBelt:
-    def __init__(self):
+    def __init__(self, spawn_rate, width):
         self.curr_id = 0
+        self.width = width
+        self.spawn_rate = SpawnManager(spawn_rate)
         self.content = {}
 
     def add_item(self):
-        pos_x = random.randint(0, 100)
-        new_id = self.__get_next_id__()
-        item = Item(new_id, pos_x, 0)
-        self.content[new_id] = item
-        return item
+        if self.spawn_rate:
+            pos_x = random.randint(0, self.width)
+            new_id = self.__get_next_id__()
+            item = Item(new_id, pos_x, 0)
+            self.content[new_id] = item
+            return item
+        return None
 
     def take_item(self, item_id):
         self.content.pop(item_id)
@@ -68,7 +82,7 @@ class ConveiorBeltNode(Node):
     def __init__(self):
         super().__init__(NODE_NAME)
         self.config = load_configuration(self, ConveiorConfig)
-        self.belt = ConveiorBelt()
+        self.belt = ConveiorBelt(self.config.spawn_rate, self.config.width)
         self.ctrl_pub = self.create_publisher(msg.NewItem, "new_item_topic", 10)
         self.arm_pub = self.create_publisher(msg.ItemLocation, "in_reach_topic", 10)
         self.create_timer(TIMER_PERIOD, self.publish_updates)
@@ -79,11 +93,11 @@ class ConveiorBeltNode(Node):
         self.send_item_location_msg()
 
     def update_controller(self):
-        item = self.belt.add_item()
-        new_item = msg.NewItem()
-        new_item.pos = item.item_x
-        new_item.id = item.item_id
-        self.ctrl_pub.publish(new_item)
+        if item := self.belt.add_item():
+            new_item = msg.NewItem()
+            new_item.pos = item.item_x
+            new_item.id = item.item_id
+            self.ctrl_pub.publish(new_item)
 
     def send_item_location_msg(self):
         for item in self.belt.content.values():

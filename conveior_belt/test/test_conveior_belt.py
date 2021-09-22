@@ -4,6 +4,15 @@ import pytest
 from conveior_belt import conveior_belt
 
 
+def test_spawn_rate():
+    spawn_rate = conveior_belt.SpawnManager(100)
+    count = 0
+    for _ in range(1000):
+        if spawn_rate.should_spawn():
+            count += 1
+    assert count == 10
+
+
 def test_item_position():
     """
     Test that each item on the conveior belt is in
@@ -22,7 +31,7 @@ def test_item_position():
 
 
 def init_conveior():
-    belt = conveior_belt.ConveiorBelt()
+    belt = conveior_belt.ConveiorBelt(1, 100)
     for _ in range(3):
         belt.step_ahead(45)
         belt.add_item()

@@ -169,7 +169,7 @@ class FakeArmNode(Node):
         pkt.state = self.arm.get_state()
         self.state_pub.publish(pkt)
         self.__log__(f"ID: {self.arm.robot_id} - {self.arm.get_state()}")
-        self.gui("State", f"ID: {self.arm.robot_id} - {self.arm.get_state()}")
+        self.gui.set_text("State", f"ID: {self.arm.robot_id} - {self.arm.get_state()}")
 
     def conveior_belt_listener(self, item_loc: msg.ItemLocation):
         self.arm.handle_item_location(item_loc)

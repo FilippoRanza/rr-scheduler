@@ -31,7 +31,7 @@ def init_gui(title, names):
     return GuiLog(root, title, names)
 
 def run_gui(gui: GuiLog):
-    process = multiprocessing.Process(gui.mainloop)
+    process = multiprocessing.Process(target=gui.mainloop)
     process.start()
     return process
 

@@ -15,6 +15,7 @@ import rclpy
 from rclpy.node import Node
 from rr_interfaces import msg
 from load_config import load_configuration
+from gui_log import init_gui, run_gui
 
 from . import get_best
 
@@ -234,12 +235,12 @@ def controller_factory(conf: ControllerConfiguration):
 class ControllerNode(Node):
     """Empty Node implementation"""
 
-    def __init__(self):
+    def __init__(self, gui):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
         self.config = load_configuration(self, ControllerConfiguration)
         self.controller = controller_factory(self.config)
-
+        self.gui = gui
         self.conv_sub = self.create_subscription(
             msg.NewItem, "new_item_topic", self.conveior_state_listener, 10
         )
@@ -253,7 +254,7 @@ class ControllerNode(Node):
     def conveior_state_listener(self, new_item: msg.NewItem):
         robot_id = self.controller.handle_new_item(new_item.pos)
         self.__notify_robots__(new_item.id, robot_id)
-        self.get_logger().info(self.controller.get_arm_stat_msg())
+        self.gui.set_text( "Status", self.controller.get_arm_stat_msg())
 
     def arm_state_listener(self, arm_state: msg.ArmState):
         state = ArmState.from_int(arm_state.state)
@@ -272,7 +273,11 @@ def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
-    node = ControllerNode()
+    gui = init_gui("Controller", ["Status", "Info"])
+
+    node = ControllerNode(gui)
+
+    run_gui(gui)
 
     rclpy.spin(node)
 

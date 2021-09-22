@@ -9,7 +9,7 @@ function run() {
 }
 
 
-for dir in rr_interfaces load_config controller conveior_belt fake_arm; do
+for dir in rr_interfaces gui_log load_config controller conveior_belt fake_arm; do
     cd "$dir"
     colcon build --packages-select "$dir"
     source install/setup.bash

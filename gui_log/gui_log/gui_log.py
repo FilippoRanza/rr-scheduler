@@ -11,6 +11,7 @@ class GuiLog(tk.Frame):
         title = tk.Label(self, text=title)
         title.grid(row=0, column=0, columnspan=2)
         self.labels = self.make_list(names)
+        self.queue = multiprocessing.Queue()
         self.__update_gui__()
 
     def make_list(self, names):
@@ -25,12 +26,14 @@ class GuiLog(tk.Frame):
 
     def set_text(self, name, text):
         print(f"{name} -> {text}")
-        lbl = self.labels[name]
-        lbl["text"] = text
+        self.queue.put((name, text))
 
     def __update_gui__(self):
         print("Time update")
-        self.update()
+        while not self.queue.empty():
+            name, text = self.queue.get()
+            self.labels[name]["text"] = text
+            self.update()
         self.after(1, self.__update_gui__)
 
 def init_gui(title, names):

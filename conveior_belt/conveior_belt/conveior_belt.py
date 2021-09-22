@@ -126,6 +126,7 @@ def main():
     gui = init_gui("Conveior Belt", ["Item", "Count"])
 
     node = ConveiorBeltNode(gui)
+    run_gui(gui)
     for _ in range(10000):
         rclpy.spin_once(node)
 

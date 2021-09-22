@@ -191,7 +191,7 @@ def main():
 
     fake_arm = FakeArm()
     node = FakeArmNode(fake_arm, gui)
-
+    run_gui(gui)
     rclpy.spin(node)
 
     node.destroy_node()

@@ -177,7 +177,7 @@ class FakeArmNode(Node):
 
     def __log__(self, log_msg):
         logger = self.get_logger()
-        logger.info(log_msg)
+        #logger.info(log_msg)
 
 
 def main():

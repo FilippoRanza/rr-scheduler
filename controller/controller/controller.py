@@ -262,7 +262,6 @@ class ControllerNode(Node):
 
 
     def __notify_robots__(self, item_id, robot_id):
-        self.get_logger().info('Ciao')
         take_item = msg.TakeItem()
         take_item.item_id = item_id
         take_item.robot_id = robot_id

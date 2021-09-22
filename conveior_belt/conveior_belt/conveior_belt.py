@@ -55,7 +55,7 @@ class ConveiorBelt:
         self.content = {}
 
     def add_item(self):
-        if self.spawn_rate:
+        if self.spawn_rate.should_spawn():
             pos_x = random.randint(0, self.width)
             new_id = self.__get_next_id__()
             item = Item(new_id, pos_x, 0)

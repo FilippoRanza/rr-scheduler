@@ -23,6 +23,7 @@ class GuiLog(tk.Frame):
         return output
 
     def set_text(self, name, text):
+        print(f"{name} -> {text}")
         lbl = self.labels[name]
         lbl["text"] = text
 

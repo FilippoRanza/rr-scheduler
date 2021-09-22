@@ -254,7 +254,7 @@ class ControllerNode(Node):
     def conveior_state_listener(self, new_item: msg.NewItem):
         robot_id = self.controller.handle_new_item(new_item.pos)
         self.__notify_robots__(new_item.id, robot_id)
-        self.gui.set_text( "Status", self.controller.get_arm_stat_msg())
+        self.gui.set_text("Status", self.controller.get_arm_stat_msg())
 
     def arm_state_listener(self, arm_state: msg.ArmState):
         state = ArmState.from_int(arm_state.state)

@@ -11,6 +11,7 @@ class GuiLog(tk.Frame):
         title = tk.Label(self, text=title)
         title.grid(row=0, column=0, columnspan=2)
         self.labels = self.make_list(names)
+        self.__update_gui__()
 
     def make_list(self, names):
         output = {}
@@ -26,7 +27,10 @@ class GuiLog(tk.Frame):
         print(f"{name} -> {text}")
         lbl = self.labels[name]
         lbl["text"] = text
+
+    def __update_gui__(self):
         self.update()
+        self.after(1, self.__update_gui__)
 
 def init_gui(title, names):
     root = tk.Tk()

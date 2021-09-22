@@ -42,7 +42,7 @@ class ControllerConfiguration:
     arm_pick_time: int
     arm_drop_time: int
     arm_speed: int
-
+    arm_rest_dist: int
 
 class ArmState(Enum):
     """
@@ -140,11 +140,17 @@ class ArmChooser:
 
     def compute_score(self):
         hits_var = self.get_variance(lambda arm: arm.hits)
-        dist_var = self.get_variance(lambda arm: arm.dist)
+        #dist_var = self.get_variance(lambda arm: arm.dist)
+        dist_var = 0
         return hits_var + dist_var
 
     def get_variance(self, func):
         vec = [func(arm) for arm in self.arm_stats]
+        vec = np.array(vec)
+        norm = np.linalg.norm(vec)
+        if norm == 0:
+            norm = 1
+        vec = vec / norm
         return np.var(vec)
 
     def __iter_arms__(self):
@@ -170,6 +176,21 @@ class Controller:
     def update_arm_state(self, state: ArmState, time: float, robot_id: int):
         self.arm_infos[robot_id].state = state
         self.arm_infos[robot_id].time = time
+
+    def get_arm_stat_msg(self):
+        output = ""
+        for stat in self.arm_stats:
+            curr = f"{stat.hits} {stat.dist}\t"
+            output += curr
+        return output
+
+    def get_arm_info_msg(self):
+        output = ""
+        for info in self.arm_infos:
+            curr = f"{info.state}\t"
+            output += curr
+        return output
+        
 
 
 def pythagoras(cat_a, cat_b):
@@ -198,7 +219,7 @@ def make_arm_stat_list(count):
 
 def controller_factory(conf: ControllerConfiguration):
     max_take_time = compute_max_take_time(
-        conf.arm_speed, conf.arm_span, conf.rest_dist, conf.conveior_width
+        conf.arm_speed, conf.arm_span, conf.arm_rest_dist, conf.conveior_width
     )
     arm_infos = [
         ArmInfo(
@@ -230,14 +251,17 @@ class ControllerNode(Node):
         self.arm_cmd = self.create_publisher(msg.TakeItem, "take_item_cmd_topic", 10)
 
     def conveior_state_listener(self, new_item: msg.NewItem):
-        robot_id = self.controller.handle_new_item(new_item.item_pos)
-        self.__notify_robots__(new_item.item_id, robot_id)
+        robot_id = self.controller.handle_new_item(new_item.pos)
+        self.__notify_robots__(new_item.id, robot_id)
+        self.get_logger().info(self.controller.get_arm_stat_msg())
 
     def arm_state_listener(self, arm_state: msg.ArmState):
         state = ArmState.from_int(arm_state.state)
-        self.controller.update_arm_state(state, state.time, state.robot_id)
+        self.controller.update_arm_state(state, arm_state.time, arm_state.robot_id)
+
 
     def __notify_robots__(self, item_id, robot_id):
+        self.get_logger().info('Ciao')
         take_item = msg.TakeItem()
         take_item.item_id = item_id
         take_item.robot_id = robot_id
@@ -249,6 +273,8 @@ def main():
     rclpy.init(args=sys.argv)
 
     node = ControllerNode()
+
+    rclpy.spin(node)
 
     node.destroy_node()
     rclpy.shutdown()

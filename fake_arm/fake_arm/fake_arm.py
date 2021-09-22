@@ -80,9 +80,11 @@ class FakeArm:
         self.take_items = []
         self.item_loc = {}
         self.status = ArmStatus()
+        self.robot_id = -1
 
     def set_config(self, conf: RobotConfig):
         self.config = conf
+        self.robot_id = conf.arm_id
 
     def update_state(self):
         if self.status.state == ArmState.READY:
@@ -153,21 +155,24 @@ class FakeArmNode(Node):
             msg.TakeItem, "take_item_cmd_topic", self.controller_listener, 10
         )
         self.state_pub = self.create_publisher(msg.ArmState, "arm_state_topic", 10)
-        self.create_timer(TIMER_DELAY, self.arm.update_state)
+        self.create_timer(TIMER_DELAY, self.run_step)
+
+    def run_step(self):
+        self.arm.update_state()
+        self.arm_state_broadcaster()
 
     def arm_state_broadcaster(self):
         pkt = msg.ArmState()
         pkt.robot_id = self.arm.robot_id
-        pkt.time = self.arm.get_time()
+        pkt.time = float(self.arm.get_time())
         pkt.state = self.arm.get_state()
         self.state_pub.publish(pkt)
+        self.__log__(f"ID: {self.arm.robot_id} - {self.arm.get_state()}")
 
     def conveior_belt_listener(self, item_loc: msg.ItemLocation):
-        self.__log__("reach info")
         self.arm.handle_item_location(item_loc)
 
     def controller_listener(self, take_cmd: msg.TakeItem):
-        self.__log__("take item cmd")
         self.arm.handle_take_item(take_cmd)
 
     def __log__(self, log_msg):
@@ -182,10 +187,7 @@ def main():
     fake_arm = FakeArm()
     node = FakeArmNode(fake_arm)
 
-    # try:
-    #     rclpy.spin(node)
-    # except KeyboardInterrupt:
-    #     print("Node interrupt")
+    rclpy.spin(node)
 
     node.destroy_node()
     rclpy.shutdown()

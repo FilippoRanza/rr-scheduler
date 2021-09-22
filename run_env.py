@@ -80,6 +80,8 @@ def make_arm_node(index, params):
     return Node(
         package="fake_arm",
         executable="fake_arm",
+        output="screen",
+        emulate_tty=True,
         name=f"fake_arm_{index}",
         parameters=[params],
     )
@@ -116,7 +118,7 @@ def complete_controller_config(config):
     set_keys(
         controller_conf,
         arm_conf,
-        ["span", "pick_time", "drop_time", "speed"],
+        ["span", "pick_time", "drop_time", "speed", "rest_dist"],
         "arm",
     )
 
@@ -150,12 +152,16 @@ def generate_launch_description():
         Node(
             package="controller",
             executable="controller",
+            output="screen",
+            emulate_tty=True,
             name="main_controller",
             parameters=[controller_conf],
         ),
         Node(
             package="conveior_belt",
             executable="conveior_belt",
+            output="screen",
+            emulate_tty=True,
             name="conveior_belt",
             parameters=[
                 conveior_conf,

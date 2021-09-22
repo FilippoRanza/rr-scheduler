@@ -3,7 +3,7 @@ conveior:
   speed: 10
   width: 100
   length: 2000
-  spawn_rate: 100
+  spawn_rate: 300
   
 arm:
   span: 50

@@ -25,6 +25,27 @@ def test_arm_available():
         stats, infos = initialize_arm_list(i)
         chooser = controller.ArmChooser(stats, infos)
         assert chooser.choose_best(50) == 0, f"Index: {i}"
+        for stat in stats:
+            assert stat.dist == 0
+            assert stat.hits == 0
+            assert stat.temp_dist == 0
+
+
+
+def test_correct_stats_update():
+    stats, infos = initialize_arm_list(3)
+    ctrl = controller.Controller(stats, infos)
+    best = ctrl.handle_new_item(50)
+    for i, stat in enumerate(stats):
+        if i != best:
+            assert stat.dist == 0
+            assert stat.hits == 0
+        else:
+            assert stat.dist == 50
+            assert stat.hits == 1
+
+        assert stat.temp_dist == 0
+
 
 
 def initialize_arm_list(count):

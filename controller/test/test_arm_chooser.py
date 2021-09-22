@@ -31,7 +31,6 @@ def test_arm_available():
             assert stat.temp_dist == 0
 
 
-
 def test_correct_stats_update():
     stats, infos = initialize_arm_list(3)
     ctrl = controller.Controller(stats, infos)
@@ -45,7 +44,6 @@ def test_correct_stats_update():
             assert stat.hits == 1
 
         assert stat.temp_dist == 0
-
 
 
 def initialize_arm_list(count):

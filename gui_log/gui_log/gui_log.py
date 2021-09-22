@@ -26,6 +26,7 @@ class GuiLog(tk.Frame):
         print(f"{name} -> {text}")
         lbl = self.labels[name]
         lbl["text"] = text
+        self.update()
 
 def init_gui(title, names):
     root = tk.Tk()

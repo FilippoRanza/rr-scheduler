@@ -106,10 +106,12 @@ def main():
     arm_count = node.get_arm_count()
     proc = mp.process(target=rclpy.spin, args=node)
     proc.start()
-
+    print("Start Node")
     root = tk.Tk()
     gui_log = GuiLog(root, queue, arm_count)
+    print("Starting GUI")
     gui_log.mainloop()
+    print("Exit GUI")
 
     proc.kill()
 

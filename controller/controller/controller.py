@@ -44,6 +44,7 @@ class ControllerConfiguration:
     arm_speed: int
     arm_rest_dist: int
 
+
 class ArmState(Enum):
     """
     Current arm action.
@@ -140,7 +141,7 @@ class ArmChooser:
 
     def compute_score(self):
         hits_var = self.get_variance(lambda arm: arm.hits)
-        #dist_var = self.get_variance(lambda arm: arm.dist)
+        # dist_var = self.get_variance(lambda arm: arm.dist)
         dist_var = 0
         return hits_var + dist_var
 
@@ -190,7 +191,6 @@ class Controller:
             curr = f"{info.state}\t"
             output += curr
         return output
-        
 
 
 def pythagoras(cat_a, cat_b):
@@ -257,7 +257,6 @@ class ControllerNode(Node):
         state = ArmState.from_int(arm_state.state)
         self.controller.update_arm_state(state, arm_state.time, arm_state.robot_id)
 
-
     def __notify_robots__(self, item_id, robot_id):
         take_item = msg.TakeItem()
         take_item.item_id = item_id
@@ -268,7 +267,6 @@ class ControllerNode(Node):
 def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
-
 
     node = ControllerNode()
 

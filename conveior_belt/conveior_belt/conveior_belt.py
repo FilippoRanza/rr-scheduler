@@ -93,7 +93,7 @@ class ConveiorBeltNode(Node):
         self.send_item_location_msg()
 
     def update_controller(self):
-        if item := self.belt.add_item():            
+        if item := self.belt.add_item():
             new_item = msg.NewItem()
             new_item.pos = item.item_x
             new_item.id = item.item_id
@@ -103,7 +103,6 @@ class ConveiorBeltNode(Node):
         for item in self.belt.content.values():
             item_loc = reach_msg_factory(item)
             self.arm_pub.publish(item_loc)
-
 
 
 def reach_msg_factory(item: Item):
@@ -117,7 +116,6 @@ def reach_msg_factory(item: Item):
 def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
-
 
     node = ConveiorBeltNode()
     for _ in range(10000):

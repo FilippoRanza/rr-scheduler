@@ -183,7 +183,6 @@ def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
-
     fake_arm = FakeArm()
     node = FakeArmNode(fake_arm)
     rclpy.spin(node)

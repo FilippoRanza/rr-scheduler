@@ -53,7 +53,7 @@ class GuiLog(tk.Frame):
 
     def update_ui(self):
         while not self.queue.empty():
-            self.update_label(queue.get())
+            self.update_label(self.queue.get())
         self.after(1, self.update_ui)
 
     def update_label(self, data):

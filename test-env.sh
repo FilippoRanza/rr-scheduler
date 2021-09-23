@@ -23,7 +23,7 @@ done
 
 
 
-for dir in controller conveior_belt fake_arm; do
+for dir in gui_log controller conveior_belt fake_arm; do
     cd "$dir"
     echo "$dir"
     pytest-3

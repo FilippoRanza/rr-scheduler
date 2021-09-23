@@ -63,14 +63,14 @@ class GuiLog(tk.Frame):
         self.update()
 
 
-def handle_conveior_state_msg(msg):
-    data = f"id: {msg.id} - pos: {msg.pos}"
+def handle_conveior_state_msg(new_item):
+    data = f"id: {new_item.id} - pos: {new_item.pos}"
     return "New Item", data
 
 
-def handle_arm_state_msg(msg):
-    data = f"state: {msg.state} - time: {msg.time}"
-    return f"Arm {msg.robot_id}", data
+def handle_arm_state_msg(arm_state):
+    data = f"state: {arm_state.state} - time: {arm_state.time}"
+    return f"Arm {arm_state.robot_id}", data
 
 
 class LogNode(Node):

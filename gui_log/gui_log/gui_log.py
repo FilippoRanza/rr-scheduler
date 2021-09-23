@@ -95,7 +95,7 @@ class LogNode(Node):
         )
 
         self.arm_sub = self.create_subscription(
-            msg.ArmState, "controller_status_topic", self.arm_stats_listener, 10
+            msg.ArmStats, "controller_status_topic", self.arm_stats_listener, 10
         )
 
     def conveior_state_listener(self, new_item: msg.NewItem):

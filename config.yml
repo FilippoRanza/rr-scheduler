@@ -15,3 +15,5 @@ arm:
   pos: 150
   arm_dist: 300
   count: 3
+
+gui_log: true

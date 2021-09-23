@@ -10,6 +10,7 @@ from rclpy.node import Node
 from rr_interfaces import msg
 from load_config import load_configuration
 
+
 @dataclass
 class Config:
     arm_count: int
@@ -93,7 +94,6 @@ class LogNode(Node):
     def arm_state_listener(self, arm_state: msg.ArmState):
         data = handle_arm_state_msg(arm_state)
         self.queue.put(data)
-
 
     def get_arm_count(self):
         return self.config.arm_count

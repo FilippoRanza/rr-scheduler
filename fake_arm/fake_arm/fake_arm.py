@@ -14,7 +14,6 @@ import rclpy
 from rclpy.node import Node
 from rr_interfaces import msg
 from load_config import load_configuration
-from gui_log import init_gui, run_gui
 
 NODE_NAME = "fake_arm"
 TIMER_DELAY = 1 / 1000  # 1ms
@@ -141,13 +140,12 @@ class FakeArm:
 class FakeArmNode(Node):
     """Empty Node implementation"""
 
-    def __init__(self, arm: FakeArm, gui):
+    def __init__(self, arm: FakeArm):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
         config = load_configuration(self, RobotConfig)
         arm.set_config(config)
         self.arm = arm
-        self.gui = gui
 
         self.conv_sub = self.create_subscription(
             msg.ItemLocation, "in_reach_topic", self.conveior_belt_listener, 10
@@ -169,7 +167,6 @@ class FakeArmNode(Node):
         pkt.state = self.arm.get_state()
         self.state_pub.publish(pkt)
         self.__log__(f"ID: {self.arm.robot_id} - {self.arm.get_state()}")
-        self.gui.set_text("State", f"ID: {self.arm.robot_id} - {self.arm.get_state()}")
 
     def conveior_belt_listener(self, item_loc: msg.ItemLocation):
         self.arm.handle_item_location(item_loc)
@@ -187,11 +184,8 @@ def main():
     rclpy.init(args=sys.argv)
 
 
-    gui = init_gui("Arm", ["State"])
-
     fake_arm = FakeArm()
-    node = FakeArmNode(fake_arm, gui)
-    run_gui(gui)
+    node = FakeArmNode(fake_arm)
     rclpy.spin(node)
 
     node.destroy_node()

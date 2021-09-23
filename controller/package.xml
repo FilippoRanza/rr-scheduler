@@ -17,7 +17,6 @@
   </export>
   <exec_depend>rr_interfaces</exec_depend>
   <exec_depend>load_config</exec_depend>
-  <exec_depend>gui_log</exec_depend>
 
 
 </package>

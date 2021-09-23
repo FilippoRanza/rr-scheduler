@@ -12,7 +12,6 @@ import rclpy
 from rclpy.node import Node
 from rr_interfaces import msg
 from load_config import load_configuration
-from gui_log import init_gui, run_gui
 
 
 NODE_NAME = "conveior_belt"
@@ -80,10 +79,9 @@ class ConveiorBelt:
 class ConveiorBeltNode(Node):
     """Conveior Belt Node."""
 
-    def __init__(self, gui):
+    def __init__(self):
         super().__init__(NODE_NAME)
         self.config = load_configuration(self, ConveiorConfig)
-        self.gui = gui
         self.belt = ConveiorBelt(self.config.spawn_rate, self.config.width)
         self.ctrl_pub = self.create_publisher(msg.NewItem, "new_item_topic", 10)
         self.arm_pub = self.create_publisher(msg.ItemLocation, "in_reach_topic", 10)
@@ -95,10 +93,7 @@ class ConveiorBeltNode(Node):
         self.send_item_location_msg()
 
     def update_controller(self):
-        if item := self.belt.add_item():
-            self.gui.set_text("Item", f"{item}")
-            self.gui.set_text("Count", f"{len(self.belt.content)}")
-            
+        if item := self.belt.add_item():            
             new_item = msg.NewItem()
             new_item.pos = item.item_x
             new_item.id = item.item_id
@@ -123,10 +118,8 @@ def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
-    gui = init_gui("Conveior Belt", ["Item", "Count"])
 
-    node = ConveiorBeltNode(gui)
-    run_gui(gui)
+    node = ConveiorBeltNode()
     for _ in range(10000):
         rclpy.spin_once(node)
 

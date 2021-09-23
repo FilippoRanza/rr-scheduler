@@ -17,4 +17,4 @@ arm:
   count: 3
 
 timer-delay: 0.1
-gui_log: true
+#gui_log: true

@@ -94,6 +94,7 @@ class ConveiorBeltNode(Node):
 
     def update_controller(self):
         if item := self.belt.add_item():
+            self.get_logger().info(f"ITEM: {item}")
             new_item = msg.NewItem()
             new_item.pos = item.item_x
             new_item.id = item.item_id

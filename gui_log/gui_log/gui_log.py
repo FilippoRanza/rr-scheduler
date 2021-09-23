@@ -104,7 +104,7 @@ def main():
     queue = mp.Queue()
     node = LogNode(queue)
     arm_count = node.get_arm_count()
-    proc = mp.process(target=rclpy.spin, args=node)
+    proc = mp.Process(target=rclpy.spin, args=node)
     proc.start()
     print("Start Node")
     root = tk.Tk()

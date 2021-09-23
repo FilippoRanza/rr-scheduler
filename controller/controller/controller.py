@@ -129,7 +129,6 @@ class ArmChooser:
         for i, (stat, info) in self.__iter_arms__():
             if info.is_available(pos):
                 val = self.run_test(stat, pos)
-                print(val)
                 best.update(i, val)
         return best.get_best()
 

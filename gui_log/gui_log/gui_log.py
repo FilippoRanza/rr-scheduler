@@ -88,12 +88,10 @@ class LogNode(Node):
         )
 
     def conveior_state_listener(self, new_item: msg.NewItem):
-        print("Incoming: new item")
         data = handle_conveior_state_msg(new_item)
         self.queue.put(data)
 
     def arm_state_listener(self, arm_state: msg.ArmState):
-        print("Incoming: arm state")
         data = handle_arm_state_msg(arm_state)
         self.queue.put(data)
 

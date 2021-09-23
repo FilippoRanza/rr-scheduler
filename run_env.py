@@ -173,16 +173,15 @@ def generate_launch_description():
 
     launch_nodes = static_conf + arm_conf
     if config.get("gui_log"):
-        gui_log = (
-            Node(
-                package="gui_log",
-                executable="gui_log",
-                output="screen",
-                emulate_tty=True,
-                name="gui_log",
-                parameters=[{"arm_count": len(arm_param)}],
-            ),
+        gui_log = Node(
+            package="gui_log",
+            executable="gui_log",
+            output="screen",
+            emulate_tty=True,
+            name="gui_log",
+            parameters=[{"arm_count": len(arm_param)}],
         )
+
         launch_nodes.append(gui_log)
 
     return LaunchDescription(launch_nodes)

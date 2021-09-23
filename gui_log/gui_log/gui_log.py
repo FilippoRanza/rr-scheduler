@@ -48,7 +48,9 @@ class GuiLog(tk.Frame):
         label_adder = LabelAdder(self)
         label_adder.add_label("New Item")
         for i in range(count):
-            label_adder.add_label(f"Arm {i}")
+            label_adder.add_label(f"Arm State {i}")
+            label_adder.add_label(f"Arm Stats {i}")
+
         return label_adder.get_labels()
 
     def update_ui(self):
@@ -70,7 +72,12 @@ def handle_conveior_state_msg(new_item):
 
 def handle_arm_state_msg(arm_state):
     data = f"state: {arm_state.state} - time: {arm_state.time}"
-    return f"Arm {arm_state.robot_id}", data
+    return f"Arm State {arm_state.robot_id}", data
+
+
+def handle_arm_stats_msg(arm_stats):
+    data = f"hits: {arm_stats.hits} - dist: {arm_stats.dist}"
+    return f"Arm Stats {arm_stats.robot_id}", data
 
 
 class LogNode(Node):
@@ -87,12 +94,20 @@ class LogNode(Node):
             msg.ArmState, "arm_state_topic", self.arm_state_listener, 10
         )
 
+        self.arm_sub = self.create_subscription(
+            msg.ArmState, "controller_status_topic", self.arm_stats_listener, 10
+        )
+
     def conveior_state_listener(self, new_item: msg.NewItem):
         data = handle_conveior_state_msg(new_item)
         self.queue.put(data)
 
     def arm_state_listener(self, arm_state: msg.ArmState):
         data = handle_arm_state_msg(arm_state)
+        self.queue.put(data)
+
+    def arm_stats_listener(self, arm_stats: msg.ArmStats):
+        data = handle_arm_stats_msg(arm_stats)
         self.queue.put(data)
 
     def get_arm_count(self):

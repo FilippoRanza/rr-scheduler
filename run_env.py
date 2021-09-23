@@ -167,7 +167,7 @@ def generate_launch_description():
             output="screen",
             emulate_tty=True,
             name="main_controller",
-            parameters=[controller_conf],
+            parameters=[controller_conf, {"timer_delay": timer_delay}],
         ),
         Node(
             package="conveior_belt",

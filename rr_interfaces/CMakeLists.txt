@@ -36,6 +36,7 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
     "msg/ArmState.msg" 
+    "msg/ArmStats.msg" 
     "msg/InReach.msg" 
     "msg/NewItem.msg" 
     "msg/TakeItem.msg"

@@ -44,6 +44,8 @@ class ControllerConfiguration:
     arm_speed: int
     arm_rest_dist: int
 
+    timer_delay: float
+
 
 class ArmState(Enum):
     """
@@ -248,6 +250,11 @@ class ControllerNode(Node):
 
         self.arm_cmd = self.create_publisher(msg.TakeItem, "take_item_cmd_topic", 10)
 
+        self.stat_pub = self.create_publisher(
+            msg.ArmStats, "controller_status_topic", 10
+        )
+        self.create_timer(self.config.timer_delay, self.send_controller_status)
+
     def conveior_state_listener(self, new_item: msg.NewItem):
         robot_id = self.controller.handle_new_item(new_item.pos)
         self.__notify_robots__(new_item.id, robot_id)
@@ -255,6 +262,15 @@ class ControllerNode(Node):
     def arm_state_listener(self, arm_state: msg.ArmState):
         state = ArmState.from_int(arm_state.state)
         self.controller.update_arm_state(state, arm_state.time, arm_state.robot_id)
+
+    def send_controller_status(self):
+        for i, arm in enumerate(self.controller.arm_stats):
+            arm_stats = msg.ArmStats()
+            arm_stats.robot_id = i
+            arm_stats.hits = arm.hits
+            arm_stats.dist = arm.dist
+            self.stat_pub.publish(arm_stats)
+            self.get_logger().info(f"STAT: {arm_stats}")
 
     def __notify_robots__(self, item_id, robot_id):
         take_item = msg.TakeItem()

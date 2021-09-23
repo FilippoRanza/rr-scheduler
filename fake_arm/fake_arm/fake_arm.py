@@ -16,7 +16,6 @@ from rr_interfaces import msg
 from load_config import load_configuration
 
 NODE_NAME = "fake_arm"
-TIMER_DELAY = 1 / 1000  # 1ms
 
 MISSING_VALUE = -1
 
@@ -31,6 +30,7 @@ class RobotConfig:
     drop_time: int
     rest_point: int
     drop_point: int
+    timer_delay: float
 
 
 class ArmState(Enum):
@@ -154,7 +154,7 @@ class FakeArmNode(Node):
             msg.TakeItem, "take_item_cmd_topic", self.controller_listener, 10
         )
         self.state_pub = self.create_publisher(msg.ArmState, "arm_state_topic", 10)
-        self.create_timer(TIMER_DELAY, self.run_step)
+        self.create_timer(config.timer_delay, self.run_step)
 
     def run_step(self):
         self.arm.update_state()
@@ -176,7 +176,7 @@ class FakeArmNode(Node):
 
     def __log__(self, log_msg):
         logger = self.get_logger()
-        #logger.info(log_msg)
+        logger.info(log_msg)
 
 
 def main():

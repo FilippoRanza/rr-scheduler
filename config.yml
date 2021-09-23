@@ -16,4 +16,5 @@ arm:
   arm_dist: 300
   count: 3
 
+timer-delay: 0.1
 gui_log: true

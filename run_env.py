@@ -9,6 +9,9 @@ import sys
 import yaml
 
 
+DEFAULT_TIMER_DELAY = 1 / 1000  # 1ms
+
+
 @dataclass
 class BaseArmConfig:
     span: int
@@ -138,14 +141,23 @@ def load_config():
     return complete_controller_config(output)
 
 
+def set_timer_delay(arm_conf, timer_delay):
+    for conf in arm_conf:
+        conf["timer_delay"] = timer_delay
+
+
 def generate_launch_description():
 
     config = load_config()
     conveior_conf = config["conveior"]
     arm_conf = config["arm"]
 
+    timer_delay = config.get("timer-delay", DEFAULT_TIMER_DELAY)
+
     controller_conf = config.get("controller")
     arm_param = make_arm_param_list(**arm_conf)
+    set_timer_delay(arm_param, timer_delay)
+
     set_robot_position(controller_conf, arm_param)
 
     static_conf = [
@@ -163,9 +175,7 @@ def generate_launch_description():
             output="screen",
             emulate_tty=True,
             name="conveior_belt",
-            parameters=[
-                conveior_conf,
-            ],
+            parameters=[conveior_conf, {"timer_delay": timer_delay}],
         ),
     ]
 

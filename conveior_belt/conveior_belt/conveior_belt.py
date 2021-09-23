@@ -15,7 +15,6 @@ from load_config import load_configuration
 
 
 NODE_NAME = "conveior_belt"
-TIMER_PERIOD = 1 / 1000  # 1ms
 
 
 @dataclass
@@ -23,6 +22,7 @@ class ConveiorConfig:
     speed: int
     width: int
     length: int
+    timer_delay: float
     spawn_rate: int
 
 
@@ -85,7 +85,7 @@ class ConveiorBeltNode(Node):
         self.belt = ConveiorBelt(self.config.spawn_rate, self.config.width)
         self.ctrl_pub = self.create_publisher(msg.NewItem, "new_item_topic", 10)
         self.arm_pub = self.create_publisher(msg.ItemLocation, "in_reach_topic", 10)
-        self.create_timer(TIMER_PERIOD, self.publish_updates)
+        self.create_timer(self.config.timer_delay, self.publish_updates)
 
     def publish_updates(self):
         self.belt.step_ahead(self.config.speed)

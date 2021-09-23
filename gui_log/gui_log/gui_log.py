@@ -103,11 +103,11 @@ def main():
     rclpy.init(args=sys.argv)
     queue = mp.Queue()
     node = LogNode(queue)
-    
+
     root = tk.Tk()
     arm_count = node.get_arm_count()
     gui_log = GuiLog(root, queue, arm_count)
-    
+
     proc = mp.Process(target=gui_log.mainloop)
     proc.start()
 

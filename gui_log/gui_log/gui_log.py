@@ -105,18 +105,18 @@ def main():
     rclpy.init(args=sys.argv)
     queue = mp.Queue()
     node = LogNode(queue)
-    arm_count = node.get_arm_count()
-    proc = mp.Process(target=rclpy.spin, args=(node,))
-    proc.start()
-    print("Start Node")
+    
     root = tk.Tk()
+    arm_count = node.get_arm_count()
     gui_log = GuiLog(root, queue, arm_count)
-    print("Starting GUI")
-    gui_log.mainloop()
-    print("Exit GUI")
+    
+    proc = mp.Process(target=gui_log.mainloop)
+    proc.start()
+
+    rclpy.spin(node)
 
     proc.kill()
-
+    node.destroy_node()
     rclpy.shutdown()
 
 

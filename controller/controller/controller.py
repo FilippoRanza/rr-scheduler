@@ -102,11 +102,11 @@ class ArmInfo:
         return time < self.take_time
 
     def time_for_last_item(self, cache_dict):
-        last_item = cache_dict[self.last_item]
-        dist = self.limit - last_item.curr_loc
-        time = ceil(dist / self.conveior_speed)
-        return time
-
+        if last_item := cache_dict.get(self.last_item):
+            dist = self.limit - last_item.curr_loc
+            time = ceil(dist / self.conveior_speed)
+            return time
+        return 0
 
 class ArmStats:
     """
@@ -202,6 +202,8 @@ class Controller:
     def update_arm_state(self, state: ArmState, time: float, robot_id: int):
         self.arm_infos[robot_id].state = state
         self.arm_infos[robot_id].time = time
+        if state == ArmState.READY:
+            self.arm_infos[robot_id].last_item = None
 
     def get_arm_stat_msg(self):
         output = ""

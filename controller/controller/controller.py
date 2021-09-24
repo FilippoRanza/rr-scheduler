@@ -61,6 +61,12 @@ class ArmState(Enum):
         return [cls.READY, cls.WAITING, cls.WORKING][i]
 
 
+@dataclass
+class LastArmItem:
+    arm_id: int
+    curr_loc: int
+
+
 class ArmInfo:
     """
     Manage the state of the robotic arm:
@@ -68,23 +74,38 @@ class ArmInfo:
     the current action.
     """
 
-    def __init__(self, reach_time: int, take_time: int):
+    def __init__(self, reach_time: int, take_time: int, limit: int, conveior_speed: int):
         self.time = 0
-        self.min_time = reach_time + take_time
+        self.reach_time = reach_time
+        self.take_time = take_time
         self.state = ArmState.READY
+        self.last_item = None
+        self.limit = limit
+        self.conveior_speed = conveior_speed
 
-    def set_state(self, state: ArmState):
-        self.time = 0
-        self.state = state
+    def set_state(self, state: ArmState, item_id: int):
+        self.last_item = item_id
 
-    def is_available(self, pos):
+        if self.state != ArmState.WORKING:
+            self.time = 0
+            self.state = state
+
+    def is_available(self, pos, cache_dict):
         if self.state == ArmState.READY:
             return True
-        if self.state == ArmState.WAITING:
-            return False
-        if self.state == ArmState.WORKING:
-            return self.time < self.min_time
-        raise ValueError(f"ArmState is not a valid: {self.state}")
+        else:
+            return self.check_time(pos, cache_dict)
+    
+    def check_time(self, pos, cache_dict):
+        time = self.time_for_last_item(cache_dict)
+        return time < self.take_time
+
+    def time_for_last_item(cache_dict):
+        last_item = cache_dict[self.last_item]
+        dist = self.limit - last_item.curr_loc
+        time = ceil(dist / self.conveior_speed)
+        return time
+    
 
 
 class ArmStats:
@@ -125,11 +146,12 @@ class ArmChooser:
 
     arm_stats: [ArmStats]
     arm_infos: [ArmInfo]
+    item_cache: dict
 
     def choose_best(self, pos):
         best = get_best.GetBest()
         for i, (stat, info) in self.__iter_arms__():
-            if info.is_available(pos):
+            if info.is_available(pos, self.item_cache):
                 val = self.run_test(stat, pos)
                 best.update(i, val)
         return best.get_best()
@@ -166,12 +188,15 @@ class Controller:
 
     arm_stats: [ArmStats]
     arm_infos: [ArmInfo]
+    item_cache: dict
 
-    def handle_new_item(self, item_pos: int):
+    def handle_new_item(self, item_id: int, item_pos: int):
         chooser = ArmChooser(self.arm_stats, self.arm_infos)
         best = chooser.choose_best(item_pos)
         self.arm_stats[best].add_hit(item_pos)
-        self.arm_infos[best].set_state(ArmState.WAITING)
+        self.arm_infos[best].set_state(ArmState.WAITING, item_id)
+        self.item_cache[item_id] = LastArmItem(best, item_pos)
+
         return best
 
     def update_arm_state(self, state: ArmState, time: float, robot_id: int):
@@ -191,6 +216,13 @@ class Controller:
             curr = f"{info.state}\t"
             output += curr
         return output
+
+    def remove_item(self, item_id):
+        self.item_cache.pop(item_id)
+
+    def update_location(self, item_id, item_pos):
+        if item := self.item_cache.get(item_id):
+            item.curr_loc = item_pos
 
 
 def pythagoras(cat_a, cat_b):
@@ -247,12 +279,27 @@ class ControllerNode(Node):
             msg.ArmState, "arm_state_topic", self.arm_state_listener, 10
         )
 
+        self.pick_item_sub = self.create_subscription(
+            msg.PickItem, "pick_item_topic", self.pick_item_listener, 10
+        )
+
         self.arm_cmd = self.create_publisher(msg.TakeItem, "take_item_cmd_topic", 10)
 
         self.stat_pub = self.create_publisher(
             msg.ArmStats, "controller_status_topic", 10
         )
+
+        self.item_loc_sub = self.create_subscription(
+            msg.ItemLocation, "in_reach_topic", self.item_loc_listener, 10
+        )
+
         self.create_timer(self.config.timer_delay, self.send_controller_status)
+
+    def item_loc_listener(self, item_loc: msg.ItemLocation):
+        self.controller.update_location(item_loc.item_id, item_loc.item_y)
+
+    def pick_item_listener(self, pick_item: msg.PickItem):
+        self.controller.remove_item(pick_item.item_id)
 
     def conveior_state_listener(self, new_item: msg.NewItem):
         robot_id = self.controller.handle_new_item(new_item.pos)

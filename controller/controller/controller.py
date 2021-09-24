@@ -74,7 +74,9 @@ class ArmInfo:
     the current action.
     """
 
-    def __init__(self, reach_time: int, take_time: int, limit: int, conveior_speed: int):
+    def __init__(
+        self, reach_time: int, take_time: int, limit: int, conveior_speed: int
+    ):
         self.time = 0
         self.reach_time = reach_time
         self.take_time = take_time
@@ -93,19 +95,17 @@ class ArmInfo:
     def is_available(self, pos, cache_dict):
         if self.state == ArmState.READY:
             return True
-        else:
-            return self.check_time(pos, cache_dict)
-    
+        return self.check_time(pos, cache_dict)
+
     def check_time(self, pos, cache_dict):
         time = self.time_for_last_item(cache_dict)
         return time < self.take_time
 
-    def time_for_last_item(cache_dict):
+    def time_for_last_item(self, cache_dict):
         last_item = cache_dict[self.last_item]
         dist = self.limit - last_item.curr_loc
         time = ceil(dist / self.conveior_speed)
         return time
-    
 
 
 class ArmStats:
@@ -191,7 +191,7 @@ class Controller:
     item_cache: dict
 
     def handle_new_item(self, item_id: int, item_pos: int):
-        chooser = ArmChooser(self.arm_stats, self.arm_infos)
+        chooser = ArmChooser(self.arm_stats, self.arm_infos, self.item_cache)
         best = chooser.choose_best(item_pos)
         self.arm_stats[best].add_hit(item_pos)
         self.arm_infos[best].set_state(ArmState.WAITING, item_id)
@@ -255,7 +255,10 @@ def controller_factory(conf: ControllerConfiguration):
     )
     arm_infos = [
         ArmInfo(
-            compute_reach_time(conf.conveior_speed, pos, conf.arm_span), max_take_time
+            compute_reach_time(conf.conveior_speed, pos, conf.arm_span),
+            max_take_time,
+            pos - conf.arm_span,
+            conf.conveior_speed,
         )
         for pos in conf.arm_pos
     ]
@@ -302,7 +305,7 @@ class ControllerNode(Node):
         self.controller.remove_item(pick_item.item_id)
 
     def conveior_state_listener(self, new_item: msg.NewItem):
-        robot_id = self.controller.handle_new_item(new_item.pos)
+        robot_id = self.controller.handle_new_item(new_item.id, new_item.pos)
         self.__notify_robots__(new_item.id, robot_id)
 
     def arm_state_listener(self, arm_state: msg.ArmState):

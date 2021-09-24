@@ -99,7 +99,7 @@ class ArmInfo:
 
     def check_time(self, pos, cache_dict):
         time = self.time_for_last_item(cache_dict)
-        return time < self.take_time
+        return time > self.take_time
 
     def time_for_last_item(self, cache_dict):
         if last_item := cache_dict.get(self.last_item):

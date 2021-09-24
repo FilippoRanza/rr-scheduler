@@ -183,7 +183,7 @@ class FakeArmNode(Node):
         self.send_arm_queue_packet()
 
     def send_arm_queue_packet(self):
-        pkt = msg.ArmQueueLen
+        pkt = msg.ArmQueueLen()
         pkt.arm_id = self.arm.robot_id
         pkt.q_len = len(self.arm.take_items)
         self.queue_len_pub.publish(pkt)

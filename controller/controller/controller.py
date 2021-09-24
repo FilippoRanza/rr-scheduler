@@ -263,7 +263,7 @@ def controller_factory(conf: ControllerConfiguration):
         for pos in conf.arm_pos
     ]
     arm_stats = make_arm_stat_list(len(arm_infos))
-    return Controller(arm_stats, arm_infos)
+    return Controller(arm_stats, arm_infos, {})
 
 
 class ControllerNode(Node):

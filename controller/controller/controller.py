@@ -142,8 +142,7 @@ class ArmChooser:
 
     def compute_score(self):
         hits_var = self.get_variance(lambda arm: arm.hits)
-        # dist_var = self.get_variance(lambda arm: arm.dist)
-        dist_var = 0
+        dist_var = self.get_variance(lambda arm: arm.dist)
         return hits_var + dist_var
 
     def get_variance(self, func):

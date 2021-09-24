@@ -99,14 +99,14 @@ class ArmInfo:
 
     def check_time(self, pos, cache_dict):
         time = self.time_for_last_item(cache_dict)
-        return time > self.take_time
+        return time < self.reach_time
 
     def time_for_last_item(self, cache_dict):
         if last_item := cache_dict.get(self.last_item):
             dist = self.limit - last_item.curr_loc
             time = ceil(dist / self.conveior_speed)
-            return time
-        return 0
+            return time + self.take_time
+        return self.take_time + self.reach_time
 
 class ArmStats:
     """

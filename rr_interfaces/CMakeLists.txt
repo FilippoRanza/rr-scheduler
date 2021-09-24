@@ -42,6 +42,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     "msg/PickItem.msg" 
     "msg/ItemCount.msg" 
     "msg/TakeItem.msg"
+    "msg/ArmQueueLen.msg"
     "msg/ItemLocation.msg"
 )
 

@@ -51,6 +51,7 @@ class GuiLog(tk.Frame):
         for i in range(count):
             label_adder.add_label(f"Arm State {i}")
             label_adder.add_label(f"Arm Stats {i}")
+            label_adder.add_label(f"Arm Queue {i}")
 
         return label_adder.get_labels()
 
@@ -86,12 +87,18 @@ def handle_item_count(item_count):
     return "Item Count", data
 
 
+def handle_arm_queue(arm_queue):
+    data = str(arm_queue.q_len)
+    return f"Arm Queue {arm_queue.arm_id}", data
+
+
 class LogNode(Node):
     def __init__(self, queue):
         super().__init__("LOG_NODE")
 
         self.config = load_configuration(self, Config)
         self.queue = queue
+        self.subscriptions = []
         self.conv_sub = self.create_subscription(
             msg.NewItem, "new_item_topic", self.conveior_state_listener, 10
         )
@@ -107,6 +114,8 @@ class LogNode(Node):
         self.item_count_sub = self.create_subscription(
             msg.ItemCount, "item_count_topic", self.item_count_listener, 10
         )
+
+        self.add_subscription(msg.ArmQueueLen, "arm_queue_len_topic", handle_arm_queue)
 
     def item_count_listener(self, item_count: msg.ItemCount):
         data = handle_item_count(item_count)
@@ -126,6 +135,12 @@ class LogNode(Node):
 
     def get_arm_count(self):
         return self.config.arm_count
+
+    def add_subscription(self, pkt_type, name, function):
+        subs = self.create_subscription(
+            pkt_type, name, lambda pkt: self.queue.put(function(pkt)), 10
+        )
+        self.subscriptions.append(subs)
 
 
 def main():

@@ -165,6 +165,9 @@ class FakeArmNode(Node):
 
         self.pick_item_pub = self.create_publisher(msg.PickItem, "pick_item_topic", 10)
         self.state_pub = self.create_publisher(msg.ArmState, "arm_state_topic", 10)
+        self.queue_len_pub = self.create_publisher(
+            msg.ArmQueueLen, "arm_queue_len_topic", 10
+        )
         self.create_timer(config.timer_delay, self.run_step)
 
     def run_step(self):
@@ -176,6 +179,16 @@ class FakeArmNode(Node):
             self.pick_item_pub.publish(pick_item)
 
     def arm_state_broadcaster(self):
+        self.send_arm_state_packet()
+        self.send_arm_queue_packet()
+
+    def send_arm_queue_packet(self):
+        pkt = msg.ArmQueueLen
+        pkt.arm_id = self.arm.robot_id
+        pkt.q_len = len(self.arm.take_items)
+        self.queue_len_pub.publish(pkt)
+
+    def send_arm_state_packet(self):
         pkt = msg.ArmState()
         pkt.robot_id = self.arm.robot_id
         pkt.time = float(self.arm.get_time())

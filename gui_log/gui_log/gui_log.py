@@ -98,7 +98,7 @@ class LogNode(Node):
 
         self.config = load_configuration(self, Config)
         self.queue = queue
-        self.subscriptions = []
+        self.subscr = []
         self.conv_sub = self.create_subscription(
             msg.NewItem, "new_item_topic", self.conveior_state_listener, 10
         )
@@ -140,7 +140,7 @@ class LogNode(Node):
         subs = self.create_subscription(
             pkt_type, name, lambda pkt: self.queue.put(function(pkt)), 10
         )
-        self.subscriptions.append(subs)
+        self.subscr.append(subs)
 
 
 def main():

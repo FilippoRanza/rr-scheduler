@@ -80,6 +80,7 @@ class FakeArm:
         self.item_loc = {}
         self.status = ArmStatus()
         self.robot_id = -1
+        self.curr_item = None
 
     def set_config(self, conf: RobotConfig):
         self.config = conf
@@ -93,6 +94,14 @@ class FakeArm:
         elif self.status.state == ArmState.WORKING:
             self.handle_working()
 
+    def should_pick(self):
+        if self.curr_item:
+            output = self.curr_item
+            self.curr_item = None
+        else:
+            output = None
+        return output
+
     def handle_ready(self):
         if self.take_items:
             self.status.state = ArmState.WAITING
@@ -102,7 +111,7 @@ class FakeArm:
         if loc := self.item_loc.get(item):
             self.status.state = ArmState.WORKING
             self.status.time = compute_work_time(loc, self.config)
-            self.take_items.pop(0)
+            self.curr_item = self.take_items.pop(0)
 
     def handle_working(self):
         self.status.time -= 1
@@ -153,12 +162,18 @@ class FakeArmNode(Node):
         self.ctrl_sub = self.create_subscription(
             msg.TakeItem, "take_item_cmd_topic", self.controller_listener, 10
         )
+
+        self.pick_item_pub = self.create_publisher(msg.PickItem, "pick_item_topic", 10)
         self.state_pub = self.create_publisher(msg.ArmState, "arm_state_topic", 10)
         self.create_timer(config.timer_delay, self.run_step)
 
     def run_step(self):
         self.arm.update_state()
         self.arm_state_broadcaster()
+        if item_id := self.arm.should_pick():
+            pick_item = msg.PickItem()
+            pick_item.item_id = item_id
+            self.pick_item_pub.publish(pick_item)
 
     def arm_state_broadcaster(self):
         pkt = msg.ArmState()

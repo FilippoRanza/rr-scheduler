@@ -39,6 +39,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     "msg/ArmStats.msg" 
     "msg/InReach.msg" 
     "msg/NewItem.msg" 
+    "msg/PickItem.msg" 
+    "msg/ItemCount.msg" 
     "msg/TakeItem.msg"
     "msg/ItemLocation.msg"
 )

@@ -47,6 +47,7 @@ class GuiLog(tk.Frame):
     def setup_ui(self, count):
         label_adder = LabelAdder(self)
         label_adder.add_label("New Item")
+        label_adder.add_label("Item Count")
         for i in range(count):
             label_adder.add_label(f"Arm State {i}")
             label_adder.add_label(f"Arm Stats {i}")
@@ -80,6 +81,11 @@ def handle_arm_stats_msg(arm_stats):
     return f"Arm Stats {arm_stats.robot_id}", data
 
 
+def handle_item_count(item_count):
+    data = str(item_count.count)
+    return "Item Count", data
+
+
 class LogNode(Node):
     def __init__(self, queue):
         super().__init__("LOG_NODE")
@@ -97,6 +103,14 @@ class LogNode(Node):
         self.arm_sub = self.create_subscription(
             msg.ArmStats, "controller_status_topic", self.arm_stats_listener, 10
         )
+
+        self.item_count_sub = self.create_subscription(
+            msg.ItemCount, "item_count_topic", self.item_count_listener, 10
+        )
+
+    def item_count_listener(self, item_count: msg.ItemCount):
+        data = handle_item_count(item_count)
+        self.queue.put(data)
 
     def conveior_state_listener(self, new_item: msg.NewItem):
         data = handle_conveior_state_msg(new_item)

@@ -86,7 +86,6 @@ class ArmInfo:
     def set_state(self, item_id: int):
         self.last_item = item_id
 
-
     def is_available(self, pos, cache_dict):
         if self.last_item is None:
             return True
@@ -306,7 +305,7 @@ class ControllerNode(Node):
 
     def arm_state_listener(self, arm_state: msg.ArmState):
         state = ArmState.from_int(arm_state.state)
-        self.controller.update_arm_state(state, arm_state.time, arm_state.robot_id)
+        self.controller.update_arm_state(state, arm_state.robot_id)
 
     def send_controller_status(self):
         for i, arm in enumerate(self.controller.arm_stats):

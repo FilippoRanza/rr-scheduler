@@ -77,23 +77,18 @@ class ArmInfo:
     def __init__(
         self, reach_time: int, take_time: int, limit: int, conveior_speed: int
     ):
-        self.time = 0
         self.reach_time = reach_time
         self.take_time = take_time
-        self.state = ArmState.READY
         self.last_item = None
         self.limit = limit
         self.conveior_speed = conveior_speed
 
-    def set_state(self, state: ArmState, item_id: int):
+    def set_state(self, item_id: int):
         self.last_item = item_id
 
-        if self.state != ArmState.WORKING:
-            self.time = 0
-            self.state = state
 
     def is_available(self, pos, cache_dict):
-        if self.state == ArmState.READY:
+        if self.last_item is None:
             return True
         return self.check_time(pos, cache_dict)
 
@@ -107,6 +102,7 @@ class ArmInfo:
             time = ceil(dist / self.conveior_speed)
             return time + self.take_time
         return self.take_time + self.reach_time
+
 
 class ArmStats:
     """
@@ -194,14 +190,12 @@ class Controller:
         chooser = ArmChooser(self.arm_stats, self.arm_infos, self.item_cache)
         best = chooser.choose_best(item_pos)
         self.arm_stats[best].add_hit(item_pos)
-        self.arm_infos[best].set_state(ArmState.WAITING, item_id)
+        self.arm_infos[best].set_state(item_id)
         self.item_cache[item_id] = LastArmItem(best, item_pos)
 
         return best
 
-    def update_arm_state(self, state: ArmState, time: float, robot_id: int):
-        self.arm_infos[robot_id].state = state
-        self.arm_infos[robot_id].time = time
+    def update_arm_state(self, state: ArmState, robot_id: int):
         if state == ArmState.READY:
             self.arm_infos[robot_id].last_item = None
 

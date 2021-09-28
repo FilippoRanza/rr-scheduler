@@ -24,6 +24,7 @@ class ConveiorConfig:
     length: int
     timer_delay: float
     spawn_rate: int
+    spawn_count: int
 
 
 @dataclass
@@ -38,21 +39,26 @@ class Item:
 
 
 class SpawnManager:
-    def __init__(self, spawn_rate):
+    def __init__(self, spawn_rate, spawn_count):
         self.rate = spawn_rate
+        self.count = spawn_count
         self.index = 0
 
     def should_spawn(self):
         self.index = (self.index + 1) % self.rate
-        return self.index == 0
+        status = self.index == 0
+        if status:
+            self.count -= 1
+
+        return status if self.count >= 0 else False
 
 
 class ConveiorBelt:
-    def __init__(self, spawn_rate, width, length):
+    def __init__(self, spawn_manager, width, length):
         self.curr_id = 0
         self.width = width
         self.lengh = length
-        self.spawn_rate = SpawnManager(spawn_rate)
+        self.spawn_rate = spawn_manager
         self.content = {}
         self.fallen = 0
 
@@ -92,7 +98,8 @@ class ConveiorBeltNode(Node):
     def __init__(self):
         super().__init__(NODE_NAME)
         self.config = load_configuration(self, ConveiorConfig)
-        self.belt = ConveiorBelt(self.config.spawn_rate, self.config.width, self.config.length)
+        spawn_manager = SpawnManager(self.config.spawn_rate, self.config.spawn_count)
+        self.belt = ConveiorBelt(spawn_manager, self.config.width, self.config.length)
         self.ctrl_pub = self.create_publisher(msg.NewItem, "new_item_topic", 10)
         self.arm_pub = self.create_publisher(msg.ItemLocation, "in_reach_topic", 10)
         self.count_pub = self.create_publisher(msg.ItemCount, "item_count_topic", 10)
@@ -145,8 +152,7 @@ def main():
     rclpy.init(args=sys.argv)
 
     node = ConveiorBeltNode()
-    for _ in range(10000):
-        rclpy.spin_once(node)
+    rclpy.spin(node)
 
     node.destroy_node()
     rclpy.shutdown()

@@ -5,12 +5,21 @@ from conveior_belt import conveior_belt
 
 
 def test_spawn_rate():
-    spawn_rate = conveior_belt.SpawnManager(100)
+    spawn_rate = conveior_belt.SpawnManager(100, 2000)
     count = 0
     for _ in range(1000):
         if spawn_rate.should_spawn():
             count += 1
     assert count == 10
+
+
+def test_spawn_count():
+    spawn_rate = conveior_belt.SpawnManager(100, 20)
+    count = 0
+    for _ in range(10000):
+        if spawn_rate.should_spawn():
+            count += 1
+    assert count == 20
 
 
 def test_item_position():
@@ -46,7 +55,8 @@ def test_item_fall():
 
 
 def init_conveior(length, speed, steps):
-    belt = conveior_belt.ConveiorBelt(1, 100, length)
+    spawn_rate = conveior_belt.SpawnManager(1, 100000)
+    belt = conveior_belt.ConveiorBelt(spawn_rate, 100, length)
     for _ in range(steps):
         belt.step_ahead(speed)
         belt.add_item()

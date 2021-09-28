@@ -4,6 +4,7 @@ conveior:
   width: 100
   length: 2000
   spawn_rate: 50
+  spawn_count: 1000
   
 arm:
   span: 50

@@ -24,10 +24,10 @@ class LabelAdder:
 
     def add_label(self, key):
         label = tk.Label(self.frame, text=key)
-        label.grid(row=self.row, column=0, padx=40, pady=50)
+        label.grid(row=self.row, column=0, padx=40, pady=10)
 
         label = tk.Label(self.frame)
-        label.grid(row=self.row, column=1, padx=40, pady=50)
+        label.grid(row=self.row, column=1, padx=40, pady=10)
         self.labels[key] = label
 
         self.row += 1

@@ -20,12 +20,15 @@ class Config:
 class BeltGui(tk.Frame):
     def __init__(self, master, queue):
         super().__init__(master)
-        self.prev_items = []
-        self.new_items = {}
-        self.update_ui()
-        self.get_new_items()
         self.queue = queue
         self.canvas = tk.Canvas(self)
+        
+        self.prev_items = []
+        self.new_items = {}
+        
+        self.update_ui()
+        self.get_new_items()
+        
 
     def update_ui(self):
         for prev in self.prev_items:

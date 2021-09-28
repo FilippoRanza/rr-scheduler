@@ -9,7 +9,7 @@ import sys
 import yaml
 
 
-DEFAULT_TIMER_DELAY = 1 / 1000  # 1ms
+DEFAULT_TIMER_DELAY = 1 / 5000  # 1ms
 
 
 @dataclass

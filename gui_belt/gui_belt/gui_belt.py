@@ -62,7 +62,7 @@ class BeltNode(Node):
         self.queue = queue
         self.subscr = []
         self.conv_sub = self.create_subscription(
-            msg.ItemLocation, "in_reach_topic", self.conveior_state_listener, 10
+            msg.ItemLocation, "in_reach_topic", self.conveior_state_listener, 50
         )
 
     def conveior_state_listener(self, pkt: msg.ItemLocation):

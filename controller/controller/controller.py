@@ -270,25 +270,25 @@ class ControllerNode(Node):
         self.config = load_configuration(self, ControllerConfiguration)
         self.controller = controller_factory(self.config)
         self.conv_sub = self.create_subscription(
-            msg.NewItem, "new_item_topic", self.conveior_state_listener, 10
+            msg.NewItem, "new_item_topic", self.conveior_state_listener, 50
         )
 
         self.arm_sub = self.create_subscription(
-            msg.ArmState, "arm_state_topic", self.arm_state_listener, 10
+            msg.ArmState, "arm_state_topic", self.arm_state_listener, 50
         )
 
         self.pick_item_sub = self.create_subscription(
-            msg.PickItem, "pick_item_topic", self.pick_item_listener, 10
+            msg.PickItem, "pick_item_topic", self.pick_item_listener, 50
         )
 
-        self.arm_cmd = self.create_publisher(msg.TakeItem, "take_item_cmd_topic", 10)
+        self.arm_cmd = self.create_publisher(msg.TakeItem, "take_item_cmd_topic", 50)
 
         self.stat_pub = self.create_publisher(
-            msg.ArmStats, "controller_status_topic", 10
+            msg.ArmStats, "controller_status_topic", 50
         )
 
         self.item_loc_sub = self.create_subscription(
-            msg.ItemLocation, "in_reach_topic", self.item_loc_listener, 10
+            msg.ItemLocation, "in_reach_topic", self.item_loc_listener, 50
         )
 
         self.create_timer(self.config.timer_delay, self.send_controller_status)

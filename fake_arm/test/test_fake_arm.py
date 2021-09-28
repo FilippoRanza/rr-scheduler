@@ -14,11 +14,11 @@ def test_euclid_distance():
     triplettes = [
         ((0, 3), (4, 0), 5.0),
         ((4, 7), (8, 4), 5.0),  # same as above but translated by 4 on both axies
-        ((0, 6), (8, 0), 10.0),
+        ((0, 6), (8, 0), 50.0),
         (
             (5, 8),
             (13, 2),
-            10.0,
+            50.0,
         ),  # same as above but translated by 5 on x-axis and 2 on y-axis
     ]
 
@@ -28,14 +28,14 @@ def test_euclid_distance():
 
 
 def test_in_reach():
-    position = 100
+    position = 500
     span = 20
     in_out = [
         (75, False),
         (80, True),
         (90, True),
-        (100, True),
-        (110, True),
+        (500, True),
+        (150, True),
         (120, True),
         (125, False),
     ]

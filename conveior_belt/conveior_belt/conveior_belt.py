@@ -99,12 +99,12 @@ class ConveiorBeltNode(Node):
         self.config = load_configuration(self, ConveiorConfig)
         spawn_manager = SpawnManager(self.config.spawn_rate, self.config.spawn_count)
         self.belt = ConveiorBelt(spawn_manager, self.config.width, self.config.length)
-        self.ctrl_pub = self.create_publisher(msg.NewItem, "new_item_topic", 10)
-        self.arm_pub = self.create_publisher(msg.ItemLocation, "in_reach_topic", 10)
-        self.count_pub = self.create_publisher(msg.ItemCount, "item_count_topic", 10)
+        self.ctrl_pub = self.create_publisher(msg.NewItem, "new_item_topic", 50)
+        self.arm_pub = self.create_publisher(msg.ItemLocation, "in_reach_topic", 50)
+        self.count_pub = self.create_publisher(msg.ItemCount, "item_count_topic", 50)
 
         self.pick_sub = self.create_subscription(
-            msg.PickItem, "pick_item_topic", self.pick_item_listener, 10
+            msg.PickItem, "pick_item_topic", self.pick_item_listener, 50
         )
 
         self.create_timer(self.config.timer_delay, self.publish_updates)

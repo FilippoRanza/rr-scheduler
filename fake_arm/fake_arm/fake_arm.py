@@ -157,16 +157,16 @@ class FakeArmNode(Node):
         self.arm = arm
 
         self.conv_sub = self.create_subscription(
-            msg.ItemLocation, "in_reach_topic", self.conveior_belt_listener, 10
+            msg.ItemLocation, "in_reach_topic", self.conveior_belt_listener, 50
         )
         self.ctrl_sub = self.create_subscription(
-            msg.TakeItem, "take_item_cmd_topic", self.controller_listener, 10
+            msg.TakeItem, "take_item_cmd_topic", self.controller_listener, 50
         )
 
-        self.pick_item_pub = self.create_publisher(msg.PickItem, "pick_item_topic", 10)
-        self.state_pub = self.create_publisher(msg.ArmState, "arm_state_topic", 10)
+        self.pick_item_pub = self.create_publisher(msg.PickItem, "pick_item_topic", 50)
+        self.state_pub = self.create_publisher(msg.ArmState, "arm_state_topic", 50)
         self.queue_len_pub = self.create_publisher(
-            msg.ArmQueueLen, "arm_queue_len_topic", 10
+            msg.ArmQueueLen, "arm_queue_len_topic", 50
         )
         self.create_timer(config.timer_delay, self.run_step)
 

@@ -24,10 +24,10 @@ class LabelAdder:
 
     def add_label(self, key):
         label = tk.Label(self.frame, text=key)
-        label.grid(row=self.row, column=0, padx=40, pady=10)
+        label.grid(row=self.row, column=0, padx=40, pady=50)
 
         label = tk.Label(self.frame)
-        label.grid(row=self.row, column=1, padx=40, pady=10)
+        label.grid(row=self.row, column=1, padx=40, pady=50)
         self.labels[key] = label
 
         self.row += 1
@@ -100,19 +100,19 @@ class LogNode(Node):
         self.queue = queue
         self.subscr = []
         self.conv_sub = self.create_subscription(
-            msg.NewItem, "new_item_topic", self.conveior_state_listener, 10
+            msg.NewItem, "new_item_topic", self.conveior_state_listener, 50
         )
 
         self.arm_sub = self.create_subscription(
-            msg.ArmState, "arm_state_topic", self.arm_state_listener, 10
+            msg.ArmState, "arm_state_topic", self.arm_state_listener, 50
         )
 
         self.arm_sub = self.create_subscription(
-            msg.ArmStats, "controller_status_topic", self.arm_stats_listener, 10
+            msg.ArmStats, "controller_status_topic", self.arm_stats_listener, 50
         )
 
         self.item_count_sub = self.create_subscription(
-            msg.ItemCount, "item_count_topic", self.item_count_listener, 10
+            msg.ItemCount, "item_count_topic", self.item_count_listener, 50
         )
 
         self.add_subscription(msg.ArmQueueLen, "arm_queue_len_topic", handle_arm_queue)
@@ -138,7 +138,7 @@ class LogNode(Node):
 
     def add_subscription(self, pkt_type, name, function):
         subs = self.create_subscription(
-            pkt_type, name, lambda pkt: self.queue.put(function(pkt)), 10
+            pkt_type, name, lambda pkt: self.queue.put(function(pkt)), 50
         )
         self.subscr.append(subs)
 

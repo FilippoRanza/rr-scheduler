@@ -38,7 +38,7 @@ class BeltGui(tk.Frame):
 
         for item_x, item_y in self.new_items.values():
             new_item = self.canvas.create_oval(
-                item_x - 2, item_y - 2, item_x + 2, item_y - 2, fill="#ff0000"
+                item_x - 4, item_y - 4, item_x + 4, item_y - 4, fill="#ff0000"
             )
             self.prev_items.append(new_item)
         self.new_items.clear()

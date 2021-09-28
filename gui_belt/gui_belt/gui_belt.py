@@ -31,6 +31,7 @@ class BeltGui(tk.Frame):
         
 
     def update_ui(self):
+        self.pack(fill=tk.BOTH, expand=1)
         for prev in self.prev_items:
             self.canvas.delete(prev)
         self.prev_items.clear()
@@ -42,6 +43,7 @@ class BeltGui(tk.Frame):
             self.prev_items.append(new_item)
         self.new_items.clear()
 
+        self.canvas.pack(fill=tk.BOTH, expand=1)
         self.update()
         self.after(50, self.update_ui)
 

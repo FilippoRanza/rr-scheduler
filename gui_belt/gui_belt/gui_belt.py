@@ -24,16 +24,17 @@ class BeltGui(tk.Frame):
         self.new_items = {}
         self.update_ui()
         self.get_new_items()
+        self.queue = queue
         self.canvas = tk.Canvas(self)
 
     def update_ui(self):
         for prev in self.prev_items:
-            self.canvas.remove(prev)
+            self.canvas.delete(prev)
         self.prev_items.clear()
 
-        for x, y in self.new_items.values():
+        for item_x, item_y in self.new_items.values():
             new_item = self.canvas.create_oval(
-                x - 2, y - 2, x + 2, y - 2, fill="#ff0000"
+                item_x - 2, item_y - 2, item_x + 2, item_y - 2, fill="#ff0000"
             )
             self.prev_items.append(new_item)
         self.new_items.clear()

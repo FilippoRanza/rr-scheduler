@@ -195,7 +195,7 @@ def generate_launch_description():
     arm_conf = initialize_arm(arm_param)
 
     launch_nodes = static_conf + arm_conf
-    if config.get(name):
+    if config.get("gui_log"):
         add_gui_node("gui_log", {"arm_count": len(arm_param)}, launch_nodes)
 
     if config.get("gui_belt"):

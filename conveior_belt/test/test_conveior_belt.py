@@ -41,17 +41,16 @@ def test_item_position():
 
 def test_item_fall():
     """
-    If items are not picked by robots they should 
+    If items are not picked by robots they should
     fall off conveior belt's end
     """
     length = 350
     speed = 50
-    steps = (length // speed) + 2 # init_conveior steps and then adds a new item
+    steps = (length // speed) + 2  # init_conveior steps and then adds a new item
     belt = init_conveior(length, speed, steps)
     # The first item is removed
     assert belt.fallen == 1, belt.content
-    assert len(belt.content) == (steps - 1) 
-
+    assert len(belt.content) == (steps - 1)
 
 
 def init_conveior(length, speed, steps):

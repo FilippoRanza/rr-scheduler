@@ -146,6 +146,19 @@ def set_timer_delay(arm_conf, timer_delay):
         conf["timer_delay"] = timer_delay
 
 
+def add_gui_node(name, params, node_list):
+    gui_node = Node(
+        package=name,
+        executable=name,
+        output="screen",
+        emulate_tty=True,
+        name=name,
+        parameters=[params],
+    )
+
+    node_list.append(gui_node)
+
+
 def generate_launch_description():
 
     config = load_config()
@@ -182,16 +195,14 @@ def generate_launch_description():
     arm_conf = initialize_arm(arm_param)
 
     launch_nodes = static_conf + arm_conf
-    if config.get("gui_log"):
-        gui_log = Node(
-            package="gui_log",
-            executable="gui_log",
-            output="screen",
-            emulate_tty=True,
-            name="gui_log",
-            parameters=[{"arm_count": len(arm_param)}],
-        )
+    if config.get(name):
+        add_gui_node("gui_log", {"arm_count": len(arm_param)}, launch_nodes)
 
-        launch_nodes.append(gui_log)
+    if config.get("gui_belt"):
+        add_gui_node(
+            "gui_belt",
+            {"width": conveior_conf["width"], "length": conveior_conf["length"]},
+            launch_nodes,
+        )
 
     return LaunchDescription(launch_nodes)

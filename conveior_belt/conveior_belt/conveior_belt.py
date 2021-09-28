@@ -85,7 +85,6 @@ class ConveiorBelt:
         for fall in fallen:
             self.content.pop(fall)
 
-
     def __get_next_id__(self):
         tmp = self.curr_id
         self.curr_id += 1

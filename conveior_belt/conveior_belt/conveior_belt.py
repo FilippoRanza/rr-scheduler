@@ -48,11 +48,13 @@ class SpawnManager:
 
 
 class ConveiorBelt:
-    def __init__(self, spawn_rate, width):
+    def __init__(self, spawn_rate, width, length):
         self.curr_id = 0
         self.width = width
+        self.lengh = length
         self.spawn_rate = SpawnManager(spawn_rate)
         self.content = {}
+        self.fallen = 0
 
     def add_item(self):
         if self.spawn_rate.should_spawn():
@@ -67,8 +69,16 @@ class ConveiorBelt:
         self.content.pop(item_id)
 
     def step_ahead(self, amount):
-        for item in self.content.values():
+        fallen = []
+        for index, item in self.content.items():
             item.move_down(amount)
+            if item.item_y > self.lengh:
+                fallen.append(index)
+
+        self.fallen += len(fallen)
+        for fall in fallen:
+            self.content.pop(fall)
+
 
     def __get_next_id__(self):
         tmp = self.curr_id
@@ -82,7 +92,7 @@ class ConveiorBeltNode(Node):
     def __init__(self):
         super().__init__(NODE_NAME)
         self.config = load_configuration(self, ConveiorConfig)
-        self.belt = ConveiorBelt(self.config.spawn_rate, self.config.width)
+        self.belt = ConveiorBelt(self.config.spawn_rate, self.config.width, self.config.length)
         self.ctrl_pub = self.create_publisher(msg.NewItem, "new_item_topic", 10)
         self.arm_pub = self.create_publisher(msg.ItemLocation, "in_reach_topic", 10)
         self.count_pub = self.create_publisher(msg.ItemCount, "item_count_topic", 10)

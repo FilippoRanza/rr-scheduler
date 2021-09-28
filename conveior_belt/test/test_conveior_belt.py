@@ -18,7 +18,7 @@ def test_item_position():
     Test that each item on the conveior belt is in
     the expected position
     """
-    belt = init_conveior()
+    belt = init_conveior(length=1500, speed=45, steps=3)
     content = belt.content
     assert len(content) == 3
     for i in range(3):
@@ -30,9 +30,24 @@ def test_item_position():
     assert belt.content[2].item_y == 0
 
 
-def init_conveior():
-    belt = conveior_belt.ConveiorBelt(1, 100)
-    for _ in range(3):
-        belt.step_ahead(45)
+def test_item_fall():
+    """
+    If items are not picked by robots they should 
+    fall off conveior belt's end
+    """
+    length = 350
+    speed = 50
+    steps = (length // speed) + 2 # init_conveior steps and then adds a new item
+    belt = init_conveior(length, speed, steps)
+    # The first item is removed
+    assert belt.fallen == 1, belt.content
+    assert len(belt.content) == (steps - 1) 
+
+
+
+def init_conveior(length, speed, steps):
+    belt = conveior_belt.ConveiorBelt(1, 100, length)
+    for _ in range(steps):
+        belt.step_ahead(speed)
         belt.add_item()
     return belt

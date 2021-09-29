@@ -139,7 +139,7 @@ class ConveiorBeltNode(Node):
             self.arm_pub.publish(item_loc)
 
     def is_debug(self):
-        self.config.debug
+        return self.config.debug
 
 def reach_msg_factory(item: Item):
     in_reach = msg.ItemLocation()

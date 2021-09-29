@@ -320,7 +320,7 @@ class ControllerNode(Node):
             self.get_logger().info(f"STAT: {arm_stats}")
 
     def is_debug(self):
-        self.config.debug
+        return self.config.debug
 
     def __notify_robots__(self, item_id, robot_id):
         take_item = msg.TakeItem()

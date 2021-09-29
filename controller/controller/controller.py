@@ -237,7 +237,7 @@ def compute_reach_time(conveior_speed, arm_pos, arm_span):
 
 
 def compute_max_take_time(arm_speed, arm_span, rest_dist, conveior_dist):
-    cathetus_a = ceil(arm_span / 2)
+    cathetus_a = arm_span
     cathetus_b = conveior_dist + rest_dist
     dist = pythagoras(cathetus_a, cathetus_b)
     return ceil(dist / arm_speed)

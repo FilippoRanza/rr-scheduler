@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/python
 
 """
 Skeleton file for a ROS node implementation
@@ -17,13 +17,9 @@ from rr_interfaces import msg
 from load_config import load_configuration
 
 from . import get_best
-
+from . import math_helper
 
 NODE_NAME = "controller"
-
-
-def ceil(num):
-    return int(np.ceil(num))
 
 
 @dataclass
@@ -100,7 +96,7 @@ class ArmInfo:
     def time_for_last_item(self, cache_dict):
         if last_item := cache_dict.get(self.last_item):
             dist = self.limit - last_item.curr_loc
-            time = ceil(dist / self.conveior_speed)
+            time = math_helper.ceil(dist / self.conveior_speed)
             return time + self.take_time
         return self.take_time + self.reach_time
 
@@ -160,18 +156,12 @@ class ArmChooser:
         return output
 
     def compute_score(self):
-        hits_var = self.get_variance(lambda arm: arm.hits)
-        dist_var = self.get_variance(lambda arm: arm.dist)
+        hits_var = self.get_score(lambda arm: arm.hits)
+        dist_var = self.get_score(lambda arm: arm.dist)
         return hits_var + dist_var
 
-    def get_variance(self, func):
-        vec = [func(arm) for arm in self.arm_stats]
-        vec = np.array(vec)
-        norm = np.linalg.norm(vec)
-        if norm == 0:
-            norm = 1
-        vec = vec / norm
-        return np.var(vec)
+    def get_score(self, func):
+        return math_helper.normed_variance(func(arm) for arm in self.arm_stats)
 
     def __iter_arms__(self):
         return enumerate(zip(self.arm_stats, self.arm_infos))
@@ -222,24 +212,29 @@ class Controller:
             item.curr_loc = item_pos
 
 
-def pythagoras(cat_a, cat_b):
-    cat_a **= 2
-    cat_b **= 2
-    cat_c = cat_a + cat_b
-    cat_c = np.sqrt(cat_c)
-    return ceil(cat_c)
-
-
 def compute_reach_time(conveior_speed, arm_pos, arm_span):
     min_take_dist = arm_pos - arm_span
-    return ceil(min_take_dist / conveior_speed)
+    return math_helper.ceil(min_take_dist / conveior_speed)
 
 
 def compute_max_take_time(arm_speed, arm_span, rest_dist, conveior_dist):
     cathetus_a = arm_span
     cathetus_b = conveior_dist + rest_dist
-    dist = pythagoras(cathetus_a, cathetus_b)
-    return ceil(dist / arm_speed)
+    dist = math_helper.pythagoras(cathetus_a, cathetus_b)
+    return math_helper.ceil(dist / arm_speed)
+
+
+@dataclass
+class TakeTime:
+    arm_speed: int
+    arm_span: int
+    rest_dist: int
+
+    def get_max_time(self, dist):
+        cathetus_a = self.arm_span
+        cathetus_b = dist + self.rest_dist
+        dist = math_helper.pythagoras(cathetus_a, cathetus_b)
+        return math_helper.ceil(dist / self.arm_speed)
 
 
 def make_arm_stat_list(count):

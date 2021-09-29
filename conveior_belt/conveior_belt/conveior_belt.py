@@ -154,7 +154,7 @@ def main():
     rclpy.init(args=sys.argv)
 
     node = ConveiorBeltNode()
-    if node.is_debug():
+    if not node.is_debug():
         rclpy.spin(node)
 
     node.destroy_node()

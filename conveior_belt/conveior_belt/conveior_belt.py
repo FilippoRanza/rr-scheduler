@@ -141,6 +141,7 @@ class ConveiorBeltNode(Node):
     def is_debug(self):
         return self.config.debug
 
+
 def reach_msg_factory(item: Item):
     in_reach = msg.ItemLocation()
     in_reach.item_x = item.item_x

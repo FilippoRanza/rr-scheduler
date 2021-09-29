@@ -49,7 +49,6 @@ class ControllerConfiguration:
     debug: bool
 
 
-
 class ArmState(Enum):
     """
     Current arm action.

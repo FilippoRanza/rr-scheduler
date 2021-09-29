@@ -158,10 +158,12 @@ def add_gui_node(name, params, node_list):
 
     node_list.append(gui_node)
 
+
 def set_debug_arm(arm_param, debug):
     for conf in arm_param:
         conf["debug"] = debug
- 
+
+
 def generate_launch_description():
 
     config = load_config()
@@ -186,7 +188,11 @@ def generate_launch_description():
             output="screen",
             emulate_tty=True,
             name="main_controller",
-            parameters=[controller_conf, {"timer_delay": timer_delay}, {"debug": debug}],
+            parameters=[
+                controller_conf,
+                {"timer_delay": timer_delay},
+                {"debug": debug},
+            ],
         ),
         Node(
             package="conveior_belt",
@@ -204,7 +210,6 @@ def generate_launch_description():
 
     if config.get("debug"):
         return LaunchDescription(launch_nodes)
-
 
     if config.get("gui_log"):
         add_gui_node("gui_log", {"arm_count": len(arm_param)}, launch_nodes)

@@ -22,13 +22,12 @@ class BeltGui(tk.Frame):
         super().__init__(master)
         self.queue = queue
         self.canvas = tk.Canvas(self)
-        
+
         self.prev_items = []
         self.new_items = {}
-        
+
         self.update_ui()
         self.get_new_items()
-        
 
     def update_ui(self):
         self.pack(fill=tk.BOTH, expand=1)

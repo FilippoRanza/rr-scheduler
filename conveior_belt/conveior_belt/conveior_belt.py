@@ -25,6 +25,7 @@ class ConveiorConfig:
     timer_delay: float
     spawn_rate: int
     spawn_count: int
+    debug: bool
 
 
 @dataclass
@@ -137,6 +138,8 @@ class ConveiorBeltNode(Node):
             item_loc = reach_msg_factory(item)
             self.arm_pub.publish(item_loc)
 
+    def is_debug(self):
+        self.config.debug
 
 def reach_msg_factory(item: Item):
     in_reach = msg.ItemLocation()
@@ -151,7 +154,8 @@ def main():
     rclpy.init(args=sys.argv)
 
     node = ConveiorBeltNode()
-    rclpy.spin(node)
+    if node.is_debug():
+        rclpy.spin(node)
 
     node.destroy_node()
     rclpy.shutdown()

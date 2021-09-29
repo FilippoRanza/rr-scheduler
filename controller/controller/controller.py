@@ -46,6 +46,9 @@ class ControllerConfiguration:
 
     timer_delay: float
 
+    debug: bool
+
+
 
 class ArmState(Enum):
     """
@@ -316,6 +319,9 @@ class ControllerNode(Node):
             self.stat_pub.publish(arm_stats)
             self.get_logger().info(f"STAT: {arm_stats}")
 
+    def is_debug(self):
+        self.config.debug
+
     def __notify_robots__(self, item_id, robot_id):
         take_item = msg.TakeItem()
         take_item.item_id = item_id
@@ -329,7 +335,8 @@ def main():
 
     node = ControllerNode()
 
-    rclpy.spin(node)
+    if node.is_debug():
+        rclpy.spin(node)
 
     node.destroy_node()
     rclpy.shutdown()

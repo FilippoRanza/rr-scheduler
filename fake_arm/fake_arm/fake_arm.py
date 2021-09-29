@@ -31,6 +31,7 @@ class RobotConfig:
     rest_point: int
     drop_point: int
     timer_delay: float
+    debug: bool
 
 
 class ArmState(Enum):
@@ -152,8 +153,8 @@ class FakeArmNode(Node):
     def __init__(self, arm: FakeArm):
         """Basic constructor declaration"""
         super().__init__(NODE_NAME)
-        config = load_configuration(self, RobotConfig)
-        arm.set_config(config)
+        self.config = load_configuration(self, RobotConfig)
+        arm.set_config(self.config)
         self.arm = arm
 
         self.conv_sub = self.create_subscription(
@@ -168,7 +169,7 @@ class FakeArmNode(Node):
         self.queue_len_pub = self.create_publisher(
             msg.ArmQueueLen, "arm_queue_len_topic", 50
         )
-        self.create_timer(config.timer_delay, self.run_step)
+        self.create_timer(self.config.timer_delay, self.run_step)
 
     def run_step(self):
         self.arm.update_state()
@@ -202,6 +203,9 @@ class FakeArmNode(Node):
     def controller_listener(self, take_cmd: msg.TakeItem):
         self.arm.handle_take_item(take_cmd)
 
+    def is_debug(self):
+        return self.config.debug
+
     def __log__(self, log_msg):
         logger = self.get_logger()
         logger.info(log_msg)
@@ -213,7 +217,8 @@ def main():
 
     fake_arm = FakeArm()
     node = FakeArmNode(fake_arm)
-    rclpy.spin(node)
+    if not node.is_debug():
+        rclpy.spin(node)
 
     node.destroy_node()
     rclpy.shutdown()

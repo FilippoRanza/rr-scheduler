@@ -233,13 +233,6 @@ def compute_reach_time(conveior_speed, arm_pos, arm_span):
     return math_helper.ceil(min_take_dist / conveior_speed)
 
 
-def compute_max_take_time(arm_speed, arm_span, rest_dist, conveior_dist):
-    cathetus_a = arm_span
-    cathetus_b = conveior_dist + rest_dist
-    dist = math_helper.pythagoras(cathetus_a, cathetus_b)
-    return math_helper.ceil(dist / arm_speed)
-
-
 def make_arm_stat_list(count):
     return [ArmStats() for _ in range(count)]
 

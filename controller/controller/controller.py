@@ -114,7 +114,7 @@ class ArmInfo:
 
     def check_time(self, pos, cache_dict):
         time = self.time_for_last_item(pos, cache_dict)
-        return time < self.reach_time
+        return time < self.reach_time.max_reach_time()
 
     def time_for_last_item(self, pos, cache_dict):
         take_time = self.take_time.get_max_time(pos)

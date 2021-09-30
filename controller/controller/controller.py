@@ -245,7 +245,7 @@ def make_arm_stat_list(count):
 
 
 def controller_factory(conf: ControllerConfiguration):
-    take_time = TakeTime(conf.arm_speed, conf.arm_span, conf.rest_dist)
+    take_time = TakeTime(conf.arm_speed, conf.arm_span, conf.arm_rest_dist)
     arm_infos = [
         ArmInfo(
             compute_reach_time(conf.conveior_speed, pos, conf.arm_span),

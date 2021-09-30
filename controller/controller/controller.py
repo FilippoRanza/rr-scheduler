@@ -56,6 +56,22 @@ class TakeTime:
         return math_helper.ceil(dist / self.arm_speed)
 
 
+@dataclass
+class ReachTime:
+    conv_speed: int
+    arm_pos: int
+    arm_span: int
+
+    def reach_time(self, curr_loc):
+        min_take_dist = self.arm_pos - self.arm_span
+        distance = min_take_dist - curr_loc
+
+        return math_helper.ceil(distance / self.conv_speed)
+
+    def max_reach_time(self):
+        return self.reach_time(0)
+
+
 class ArmState(Enum):
     """
     Current arm action.
@@ -83,18 +99,10 @@ class ArmInfo:
     the current action.
     """
 
-    def __init__(
-        self,
-        reach_time: int,
-        take_time: TakeTime,
-        limit: int,
-        conveior_speed: int,
-    ):
+    def __init__(self, reach_time: ReachTime, take_time: TakeTime):
         self.reach_time = reach_time
         self.take_time = take_time
         self.last_item = None
-        self.limit = limit
-        self.conveior_speed = conveior_speed
 
     def set_state(self, item_id: int):
         self.last_item = item_id
@@ -111,10 +119,10 @@ class ArmInfo:
     def time_for_last_item(self, pos, cache_dict):
         take_time = self.take_time.get_max_time(pos)
         if last_item := cache_dict.get(self.last_item):
-            dist = self.limit - last_item.curr_loc
-            time = math_helper.ceil(dist / self.conveior_speed)
-            return time + take_time
-        return take_time + self.reach_time
+            reach_time = self.reach_time.reach_time(last_item.curr_loc)
+        else:
+            reach_time = self.reach_time.max_reach_time()
+        return take_time + reach_time
 
 
 class ArmStats:
@@ -206,31 +214,12 @@ class Controller:
         if state == ArmState.READY:
             self.arm_infos[robot_id].last_item = None
 
-    def get_arm_stat_msg(self):
-        output = ""
-        for stat in self.arm_stats:
-            curr = f"{stat.hits} {stat.dist}\t"
-            output += curr
-        return output
-
-    def get_arm_info_msg(self):
-        output = ""
-        for info in self.arm_infos:
-            curr = f"{info.state}\t"
-            output += curr
-        return output
-
     def remove_item(self, item_id):
         self.item_cache.pop(item_id)
 
     def update_location(self, item_id, item_pos):
         if item := self.item_cache.get(item_id):
             item.curr_loc = item_pos
-
-
-def compute_reach_time(conveior_speed, arm_pos, arm_span):
-    min_take_dist = arm_pos - arm_span
-    return math_helper.ceil(min_take_dist / conveior_speed)
 
 
 def make_arm_stat_list(count):
@@ -240,12 +229,7 @@ def make_arm_stat_list(count):
 def controller_factory(conf: ControllerConfiguration):
     take_time = TakeTime(conf.arm_speed, conf.arm_span, conf.arm_rest_dist)
     arm_infos = [
-        ArmInfo(
-            compute_reach_time(conf.conveior_speed, pos, conf.arm_span),
-            take_time,
-            pos - conf.arm_span,
-            conf.conveior_speed,
-        )
+        ArmInfo(ReachTime(conf.conveior_speed, pos, conf.arm_speed), take_time)
         for pos in conf.arm_pos
     ]
     arm_stats = make_arm_stat_list(len(arm_infos))

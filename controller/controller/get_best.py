@@ -26,9 +26,16 @@ class GetBest:
 
     def get_best(self):
         if self.min_value is None:
-            raise ValueError("Current min value is None. self.update never called")
+            raise MissingSelection()
         return self.min_index
 
+
+class MissingSelection(Exception):
+    """
+    Exception raisen when GetBest
+    is not given any item to choose from.
+    """
+    pass #class definition is enough
 
 def update_condition(curr, new):
     return (curr - new) > 1e-6

@@ -308,6 +308,8 @@ def run_node(node):
         rclpy.spin(node)
     except KeyboardInterrupt:
         print("Node arrested")
+    except get_best.MissingSelection:
+        print("There are no arms to choose from. Stop now!")
 
 
 def main():

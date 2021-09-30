@@ -3,12 +3,12 @@ conveior:
   speed: 10
   width: 100
   length: 2000
-  spawn_rate: 50
-  spawn_count: 1000
+  spawn_rate: 15
+  spawn_count: 100
   
 arm:
-  span: 50
-  speed: 10
+  span: 75
+  speed: 20
   pick_time: 2
   drop_time: 1
   rest_dist: -10 

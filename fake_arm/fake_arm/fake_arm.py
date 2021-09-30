@@ -211,15 +211,25 @@ class FakeArmNode(Node):
         logger.info(log_msg)
 
 
+def run_node(node):
+    if node.is_debug():
+        return
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        print("Node arrested")
+    
+
+
 def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
     fake_arm = FakeArm()
     node = FakeArmNode(fake_arm)
-    if not node.is_debug():
-        rclpy.spin(node)
-
+    
+    run_node(node)
+    
     node.destroy_node()
     rclpy.shutdown()
 

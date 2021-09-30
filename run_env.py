@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 
 from launch import LaunchDescription
+import launch.actions
 from launch_ros.actions import Node
 import sys
 import yaml
@@ -163,6 +164,11 @@ def set_debug_arm(arm_param, debug):
     for conf in arm_param:
         conf["debug"] = debug
 
+def make_shutdown():
+    return [
+        launch.actions.LogInfo(msg = "System shutdown!"),
+        launch.actions.Shutdown()
+    ]
 
 def generate_launch_description():
 
@@ -181,6 +187,7 @@ def generate_launch_description():
 
     set_robot_position(controller_conf, arm_param)
 
+
     static_conf = [
         Node(
             package="controller",
@@ -193,6 +200,7 @@ def generate_launch_description():
                 {"timer_delay": timer_delay},
                 {"debug": debug},
             ],
+            on_exit=make_shutdown(),
         ),
         Node(
             package="conveior_belt",
@@ -201,6 +209,7 @@ def generate_launch_description():
             emulate_tty=True,
             name="conveior_belt",
             parameters=[conveior_conf, {"timer_delay": timer_delay}, {"debug": debug}],
+            on_exit=make_shutdown()
         ),
     ]
 

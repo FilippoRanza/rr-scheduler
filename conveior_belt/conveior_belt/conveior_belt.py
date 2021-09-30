@@ -53,6 +53,9 @@ class SpawnManager:
 
         return status if self.count >= 0 else False
 
+    def is_done(self):
+        return self.count < 0
+
 
 class ConveiorBelt:
     def __init__(self, spawn_manager, width, length):
@@ -71,6 +74,11 @@ class ConveiorBelt:
             self.content[new_id] = item
             return item
         return None
+
+    def is_over(self):
+        empty = len(self.content) == 0 
+        done = self.spawn_rate.is_done()
+        return empty and done
 
     def take_item(self, item_id):
         self.content.pop(item_id)
@@ -141,6 +149,9 @@ class ConveiorBeltNode(Node):
     def is_debug(self):
         return self.config.debug
 
+    def is_over(self):
+        return self.belt.is_over()
+
 
 def reach_msg_factory(item: Item):
     in_reach = msg.ItemLocation()
@@ -149,6 +160,16 @@ def reach_msg_factory(item: Item):
     in_reach.item_id = item.item_id
     return in_reach
 
+def run_node(node):
+    if node.is_debug():
+        return
+        
+    try:
+        while not node.is_over():
+            rclpy.spin_once(node)
+    except KeyboardInterrupt:
+        print("Node arrested")
+
 
 def main():
     """Default entrypoint for ros2 run"""
@@ -156,7 +177,7 @@ def main():
 
     node = ConveiorBeltNode()
     if not node.is_debug():
-        rclpy.spin(node)
+        run_node(node)
 
     node.destroy_node()
     rclpy.shutdown()

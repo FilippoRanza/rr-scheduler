@@ -301,14 +301,24 @@ class ControllerNode(Node):
         self.arm_cmd.publish(take_item)
 
 
+
+def run_node(node):
+    if node.is_debug():
+        return
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        print("Node arrested")
+    
+
+
 def main():
     """Default entrypoint for ros2 run"""
     rclpy.init(args=sys.argv)
 
     node = ControllerNode()
 
-    if not node.is_debug():
-        rclpy.spin(node)
+    run_node(node)
 
     node.destroy_node()
     rclpy.shutdown()

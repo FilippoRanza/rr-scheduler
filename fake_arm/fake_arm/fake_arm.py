@@ -218,7 +218,6 @@ def run_node(node):
         rclpy.spin(node)
     except KeyboardInterrupt:
         print("Node arrested")
-    
 
 
 def main():
@@ -227,9 +226,9 @@ def main():
 
     fake_arm = FakeArm()
     node = FakeArmNode(fake_arm)
-    
+
     run_node(node)
-    
+
     node.destroy_node()
     rclpy.shutdown()
 

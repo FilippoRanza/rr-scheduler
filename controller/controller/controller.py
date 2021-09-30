@@ -301,7 +301,6 @@ class ControllerNode(Node):
         self.arm_cmd.publish(take_item)
 
 
-
 def run_node(node):
     if node.is_debug():
         return
@@ -309,7 +308,6 @@ def run_node(node):
         rclpy.spin(node)
     except KeyboardInterrupt:
         print("Node arrested")
-    
 
 
 def main():

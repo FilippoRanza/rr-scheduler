@@ -76,7 +76,7 @@ class ConveiorBelt:
         return None
 
     def is_over(self):
-        empty = len(self.content) == 0 
+        empty = len(self.content) == 0
         done = self.spawn_rate.is_done()
         return empty and done
 
@@ -160,10 +160,11 @@ def reach_msg_factory(item: Item):
     in_reach.item_id = item.item_id
     return in_reach
 
+
 def run_node(node):
     if node.is_debug():
         return
-        
+
     try:
         while not node.is_over():
             rclpy.spin_once(node)

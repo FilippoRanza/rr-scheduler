@@ -9,8 +9,6 @@ from dataclasses import dataclass
 from enum import Enum, auto
 import sys
 
-import numpy as np
-
 import rclpy
 from rclpy.node import Node
 from rr_interfaces import msg
@@ -45,6 +43,19 @@ class ControllerConfiguration:
     debug: bool
 
 
+@dataclass
+class TakeTime:
+    arm_speed: int
+    arm_span: int
+    rest_dist: int
+
+    def get_max_time(self, dist):
+        cathetus_a = self.arm_span
+        cathetus_b = dist + self.rest_dist
+        dist = math_helper.pythagoras(cathetus_a, cathetus_b)
+        return math_helper.ceil(dist / self.arm_speed)
+
+
 class ArmState(Enum):
     """
     Current arm action.
@@ -73,7 +84,11 @@ class ArmInfo:
     """
 
     def __init__(
-        self, reach_time: int, take_time: int, limit: int, conveior_speed: int
+        self,
+        reach_time: int,
+        take_time: TakeTime,
+        limit: int,
+        conveior_speed: int,
     ):
         self.reach_time = reach_time
         self.take_time = take_time
@@ -90,15 +105,16 @@ class ArmInfo:
         return self.check_time(pos, cache_dict)
 
     def check_time(self, pos, cache_dict):
-        time = self.time_for_last_item(cache_dict)
+        time = self.time_for_last_item(pos, cache_dict)
         return time < self.reach_time
 
-    def time_for_last_item(self, cache_dict):
+    def time_for_last_item(self, pos, cache_dict):
+        take_time = self.take_time.get_max_time(pos)
         if last_item := cache_dict.get(self.last_item):
             dist = self.limit - last_item.curr_loc
             time = math_helper.ceil(dist / self.conveior_speed)
-            return time + self.take_time
-        return self.take_time + self.reach_time
+            return time + take_time
+        return take_time + self.reach_time
 
 
 class ArmStats:
@@ -224,31 +240,16 @@ def compute_max_take_time(arm_speed, arm_span, rest_dist, conveior_dist):
     return math_helper.ceil(dist / arm_speed)
 
 
-@dataclass
-class TakeTime:
-    arm_speed: int
-    arm_span: int
-    rest_dist: int
-
-    def get_max_time(self, dist):
-        cathetus_a = self.arm_span
-        cathetus_b = dist + self.rest_dist
-        dist = math_helper.pythagoras(cathetus_a, cathetus_b)
-        return math_helper.ceil(dist / self.arm_speed)
-
-
 def make_arm_stat_list(count):
     return [ArmStats() for _ in range(count)]
 
 
 def controller_factory(conf: ControllerConfiguration):
-    max_take_time = compute_max_take_time(
-        conf.arm_speed, conf.arm_span, conf.arm_rest_dist, conf.conveior_width
-    )
+    take_time = TakeTime(conf.arm_speed, conf.arm_span, conf.rest_dist)
     arm_infos = [
         ArmInfo(
             compute_reach_time(conf.conveior_speed, pos, conf.arm_span),
-            max_take_time,
+            take_time,
             pos - conf.arm_span,
             conf.conveior_speed,
         )

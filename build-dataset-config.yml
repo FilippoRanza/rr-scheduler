@@ -1,0 +1,42 @@
+arm_conf:
+  span:
+    min_value: 50
+    max_value: 50
+  speed: 
+    min_value: 1
+    max_value: 15
+  pick_time: 
+    min_value: 2
+    max_value: 2
+  drop_time:
+    min_value: 1
+    max_value: 1
+  rest_dist:
+    min_value: -30
+    max_value: -30
+  drop_dist:
+    min_value: -60
+    max_value: -60
+  pos:
+    min_value: 200
+    max_value: 200
+  arm_dist:
+    min_value: 300
+    max_value: 300
+  count:
+    min_value: 2
+    max_value: 6
+
+conv_conf:
+  speed:
+    min_value: 1
+    max_value: 20
+  width:
+    min_value: 100
+    max_value: 300
+  length:
+    min_value: 1500
+    max_value: 1500
+  spawn_rate:
+    min_value: 5
+    max_value: 40

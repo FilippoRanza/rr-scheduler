@@ -1,22 +1,19 @@
-
-conveior:
-  speed: 8
-  width: 100
-  length: 2000
-  spawn_rate: 16
-  spawn_count: 1000
-  
 arm:
-  span: 75
-  speed: 20
-  pick_time: 2
-  drop_time: 1
-  rest_dist: -10 
-  drop_dist: -40
-  pos: 150
   arm_dist: 300
-  count: 3
-
-timer-delay: 0.01
-#gui_log: true
-#gui_belt: true
+  count: 5
+  drop_dist: -60
+  drop_time: 1
+  pick_time: 2
+  pos: 200
+  rest_dist: -30
+  span: 50
+  speed: 12
+conveior:
+  length: 1500
+  spawn_count: 180
+  spawn_rate: 19
+  speed: 5
+  width: 127
+database: test-db_3.db
+index: 3348
+timer-delay: 0.005

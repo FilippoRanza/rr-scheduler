@@ -8,6 +8,7 @@ in this project.
 from dataclasses import dataclass
 from enum import Enum, auto
 import sys
+import sqlite3
 
 import rclpy
 from rclpy.node import Node
@@ -26,6 +27,9 @@ class ControllerConfiguration:
     Controller main configuration: values loaded from
     parameters.
     """
+
+    index: int
+    database: str
 
     conveior_width: int
     conveior_length: int
@@ -294,12 +298,32 @@ class ControllerNode(Node):
     def is_debug(self):
         return self.config.debug
 
+    def get_index(self):
+        return self.config.index
+
+    def get_db_name(self):
+        return self.config.database
+
     def __notify_robots__(self, item_id, robot_id):
         take_item = msg.TakeItem()
         take_item.item_id = item_id
         take_item.robot_id = robot_id
         self.arm_cmd.publish(take_item)
 
+def update_db_entry(database, index, status):
+    if not database:
+        return
+    print(database, type(database))    
+    conn = sqlite3.connect(database)
+    query = f"""
+    UPDATE instances 
+    SET status = {status}
+    WHERE id = {index} 
+    """
+    curs = conn.cursor()
+    curs.execute(query)
+    conn.commit()
+    conn.close()
 
 def run_node(node):
     if node.is_debug():
@@ -308,8 +332,11 @@ def run_node(node):
         rclpy.spin(node)
     except KeyboardInterrupt:
         print("Node arrested")
+        update_db_entry(node.get_db_name(), node.get_index(), 1)
     except get_best.MissingSelection:
         print("There are no arms to choose from. Stop now!")
+        update_db_entry(node.get_db_name(), node.get_index(), 2)
+
 
 
 def main():

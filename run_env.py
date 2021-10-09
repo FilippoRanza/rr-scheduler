@@ -126,6 +126,16 @@ def complete_controller_config(config):
         "arm",
     )
 
+    if index := config.get("index"):
+        controller_conf["index"] = index
+    else:
+        controller_conf["index"] = 0
+
+    if database := config.get("database"):
+        controller_conf["database"] = database
+    else:
+        controller_conf["database"] = ''
+
     config["controller"] = controller_conf
     return config
 

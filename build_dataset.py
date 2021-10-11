@@ -256,7 +256,7 @@ def make_config_file(database: str,
 
 def run_docker():
     wd = os.getcwd()
-    subprocess.run(["docker", "run", "-v", f"{wd}:/root", "run-ros"])
+    subprocess.run(["docker", "run", "--rm" ,"-v", f"{wd}:/root", "run-ros"])
 
 
 def parse_args():

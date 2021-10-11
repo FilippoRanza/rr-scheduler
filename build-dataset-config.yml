@@ -25,7 +25,7 @@ arm_conf:
     max_value: 300
   count:
     min_value: 2
-    max_value: 6
+    max_value: 2 
 
 conv_conf:
   speed:

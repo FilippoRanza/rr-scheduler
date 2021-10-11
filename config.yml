@@ -1,19 +1,19 @@
 arm:
   arm_dist: 300
-  count: 5
+  count: 2
   drop_dist: -60
   drop_time: 1
   pick_time: 2
   pos: 200
   rest_dist: -30
   span: 50
-  speed: 12
+  speed: 7
 conveior:
   length: 1500
   spawn_count: 180
-  spawn_rate: 19
-  speed: 5
-  width: 127
+  spawn_rate: 13
+  speed: 16
+  width: 121
 database: test-db_3.db
-index: 3348
+index: 9375
 timer-delay: 0.005
